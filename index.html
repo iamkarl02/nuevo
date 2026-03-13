@@ -310,7 +310,6 @@
         }
 
         /* ===== MARCA DE AGUA (EXACTAMENTE IGUAL) ===== */
-/* ===== MARCA DE AGUA - VERSIÓN MEJORADA ===== */
 .marca-agua {
     position: fixed;
     bottom: 30px;
@@ -338,6 +337,7 @@
     object-fit: contain;
     filter: brightness(0.95) drop-shadow(0 4px 8px rgba(0,0,0,0.5));
 }
+
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 700px) {
@@ -393,34 +393,37 @@
                 display: none;
             }
 
-/* ===== SOLO PARA MÓVIL - LOGO ARRIBA IZQUIERDA ===== */
+/* ===== MÓVIL - LOGO SUPERIOR IZQUIERDA SIN MARGEN ===== */
 @media (max-width: 700px) {
     .marca-agua {
-        bottom: auto;        /* Eliminamos bottom */
-        top: 15px;           /* Posición superior */
-        left: 15px;          /* Mantenemos izquierda */
-        width: 200px;        /* Tamaño apropiado para móvil */
-        opacity: 0.9;        /* Un poco más visible */
-        margin: 0;           /* Aseguramos que no tenga márgenes */
-        transform: none;     /* Eliminamos cualquier transformación */
+        bottom: auto;           /* Quitamos posición inferior */
+        top: 10px;              /* Espacio superior mínimo */
+        left: 0;                /* PEGADO COMPLETAMENTE A LA IZQUIERDA */
+        width: 200px;           /* Tamaño controlado */
+        opacity: 0.9;
+        margin-left: 0;         /* Aseguramos que no haya margen */
+        padding-left: 0;        /* Aseguramos que no haya padding */
+        transform: none;        /* Eliminamos transformaciones */
     }
     
     .marca-agua img {
-        max-height: 60px;    /* Altura máxima controlada */
-        width: auto;         /* Ancho automático para mantener proporción */
+        max-height: 60px;
+        margin-left: 0;         /* La imagen también sin margen */
+        padding-left: 5px;      /* MÍNIMO padding solo para que no quede pegado al borde */
     }
 }
 
 /* Para pantallas muy pequeñas */
 @media (max-width: 480px) {
     .marca-agua {
-        top: 10px;           /* Un poco menos separado */
-        left: 10px;          /* Un poco menos separado */
-        width: 180px;        /* Ligeramente más pequeño */
+        top: 8px;
+        left: 0;                /* Mantenemos pegado a la izquierda */
+        width: 180px;
     }
     
     .marca-agua img {
-        max-height: 50px;    /* Más pequeño en pantallas muy pequeñas */
+        max-height: 50px;
+        padding-left: 3px;      /* Aún menos padding en pantallas pequeñas */
     }
 }
             
@@ -434,7 +437,7 @@
     <!-- Fondo cinematográfico con imagen y overlay -->
     <div class="fondo-media">
         <!-- Usamos la primera imagen de los proyectos como fondo ambiental, pero puedes cambiarla -->
-        <img src="assets/toolbox/index/fondo.png" alt="Fondo ambiental" onerror="this.src=''">
+        <img src="" alt="Fondo ambiental" onerror="this.src='https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop'">
         <div class="overlay-cinematica"></div>
     </div>
 
