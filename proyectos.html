@@ -23,10 +23,9 @@
 
         body {
             overflow-x: hidden;
-            overflow-y: auto; /* SCROLL PERMITIDO EN MÓVIL */
+            overflow-y: auto;
         }
 
-        /* En PC no hay scroll (carrusel ocupa toda la pantalla) */
         @media (min-width: 701px) {
             html, body {
                 overflow: hidden;
@@ -345,7 +344,6 @@
             transform: scale(1.3);
         }
 
-        /* ===== BARRA SUPERIOR SOLO EN MÓVIL ===== */
         .barra-superior {
             position: fixed;
             top: 0;
@@ -483,7 +481,6 @@
             top: -40px;
         }
 
-        /* ===== MARCA DE AGUA ===== */
         .marca-agua {
             position: fixed;
             z-index: 1000;
@@ -698,7 +695,6 @@
     </style>
 </head>
 <body>
-    <!-- BARRA SUPERIOR SOLO EN MÓVIL -->
     <div class="barra-superior" id="barraSuperior"></div>
 
     <div class="carrusel-container">
@@ -793,12 +789,21 @@
             const flechaIzq = document.getElementById('flechaIzquierda');
             const flechaDer = document.getElementById('flechaDerecha');
             
-            const MOVIMIENTO_POR_CLICK = 33.333;
-            
-            let posicionActual = proyectos.length * 33.333;
             const totalProyectosReales = proyectos.length;
             
             let isTransitioning = false;
+            
+            // Calcular paso según el tamaño de pantalla
+            function getPaso() {
+                return window.innerWidth <= 700 ? 100 : 33.333;
+            }
+            
+            // Calcular posición inicial centrada
+            function getPosicionInicial() {
+                return totalProyectosReales * getPaso();
+            }
+            
+            let posicionActual = getPosicionInicial();
 
             function crearCarrusel() {
                 track.innerHTML = '';
@@ -871,11 +876,8 @@
                     
                     indicador.addEventListener('click', () => {
                         if (isTransitioning) return;
-                        if (window.innerWidth <= 700) {
-                            posicionActual = (i + totalProyectosReales) * 100;
-                        } else {
-                            posicionActual = (i + totalProyectosReales) * 33.333;
-                        }
+                        const paso = getPaso();
+                        posicionActual = (i + totalProyectosReales) * paso;
                         actualizarCarrusel();
                     });
                     
@@ -886,6 +888,8 @@
             function actualizarCarrusel(transition = true) {
                 if (isTransitioning && transition) return;
                 
+                const paso = getPaso();
+                
                 if (!transition) {
                     track.style.transition = 'none';
                 } else {
@@ -895,7 +899,7 @@
                 
                 track.style.transform = `translateX(-${posicionActual}%)`;
                 
-                let paso = (window.innerWidth <= 700) ? 100 : 33.333;
+                // Calcular índice visible
                 const proyectoVisible = Math.floor((posicionActual / paso) - totalProyectosReales + 0.1);
                 let indiceProyecto = ((proyectoVisible % totalProyectosReales) + totalProyectosReales) % totalProyectosReales;
                 
@@ -911,13 +915,12 @@
                     setTimeout(() => {
                         track.style.transition = 'none';
                         
-                        let limite = totalProyectosReales * 2 * paso;
-                        let ajuste = totalProyectosReales * paso;
+                        const limite = totalProyectosReales * 2 * paso;
+                        const ajuste = totalProyectosReales * paso;
                         
                         if (posicionActual >= limite) {
                             posicionActual = posicionActual - ajuste;
-                        }
-                        else if (posicionActual < totalProyectosReales * paso) {
+                        } else if (posicionActual < totalProyectosReales * paso) {
                             posicionActual = posicionActual + ajuste;
                         }
                         
@@ -931,15 +934,13 @@
 
             function moverIzquierda() {
                 if (isTransitioning) return;
-                let paso = (window.innerWidth <= 700) ? 100 : MOVIMIENTO_POR_CLICK;
-                posicionActual -= paso;
+                posicionActual -= getPaso();
                 actualizarCarrusel();
             }
             
             function moverDerecha() {
                 if (isTransitioning) return;
-                let paso = (window.innerWidth <= 700) ? 100 : MOVIMIENTO_POR_CLICK;
-                posicionActual += paso;
+                posicionActual += getPaso();
                 actualizarCarrusel();
             }
 
@@ -956,10 +957,16 @@
             });
 
             window.addEventListener('resize', function() {
-                let paso = (window.innerWidth <= 700) ? 100 : 33.333;
-                let indiceActual = Math.floor((posicionActual / (window.innerWidth <= 700 ? 100 : 33.333)) - totalProyectosReales + 0.5);
-                indiceActual = ((indiceActual % totalProyectosReales) + totalProyectosReales) % totalProyectosReales;
-                posicionActual = (indiceActual + totalProyectosReales) * paso;
+                const pasoAnterior = window.innerWidth <= 700 ? 100 : 33.333;
+                const pasoNuevo = getPaso();
+                
+                // Calcular índice actual
+                const indiceActual = Math.floor((posicionActual / pasoAnterior) - totalProyectosReales + 0.5);
+                const indiceNormalizado = ((indiceActual % totalProyectosReales) + totalProyectosReales) % totalProyectosReales;
+                
+                // Ajustar posición con nuevo paso
+                posicionActual = (indiceNormalizado + totalProyectosReales) * pasoNuevo;
+                
                 actualizarCarrusel(false);
             });
 
