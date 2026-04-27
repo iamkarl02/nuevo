@@ -30,7 +30,6 @@
             background: linear-gradient(180deg, #1a1a1a 0%, #000000 100%);
         }
 
-        /* HEADER */
         .header {
             padding: 12px 16px;
             display: flex;
@@ -61,7 +60,6 @@
             cursor: pointer;
         }
 
-        /* TABS */
         .tabs-container {
             padding: 12px 16px;
             background: #000000;
@@ -92,7 +90,6 @@
             color: #000000;
         }
 
-        /* SEARCH */
         .search-bar {
             margin-top: 12px;
             background: #1f1f1f;
@@ -116,7 +113,6 @@
             outline: none;
         }
 
-        /* MAIN CONTENT */
         .content {
             flex: 1;
             overflow-y: auto;
@@ -138,7 +134,6 @@
             font-size: 0.85rem;
         }
 
-        /* LISTS */
         .track-list, .playlist-list {
             display: flex;
             flex-direction: column;
@@ -212,7 +207,6 @@
             padding: 8px;
         }
 
-        /* MEDIA AREA */
         .media-area {
             display: flex;
             justify-content: center;
@@ -246,7 +240,6 @@
             to { transform: rotate(360deg); }
         }
 
-        /* FAB BUTTON */
         .fab {
             position: fixed;
             bottom: 110px;
@@ -273,7 +266,6 @@
             color: #000000;
         }
 
-        /* PLAYER BAR */
         .player-bar {
             background: #000000;
             border-top: 1px solid #1f1f1f;
@@ -377,7 +369,6 @@
             border-radius: 2px;
         }
 
-        /* DRAWERS */
         .drawer {
             position: fixed;
             top: 0;
@@ -448,7 +439,6 @@
             color: #1db954 !important;
         }
 
-        /* MODAL */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -545,7 +535,6 @@
             min-width: 180px;
         }
 
-        /* Folder info banner */
         .folder-info {
             background: #1a1a1a;
             padding: 8px 12px;
@@ -658,7 +647,7 @@
         <i class="fa-solid fa-plus"></i>
     </div>
 
-    <!-- Input para seleccionar CARPETA completa (funciona en móvil/iPhone con webkitdirectory) -->
+    <!-- Input para seleccionar CARPETA completa -->
     <input type="file" id="folderInput" class="hidden-input" webkitdirectory directory multiple>
 
     <div id="customModal" class="modal-overlay">
@@ -689,6 +678,7 @@
         let contextPlaylistIndex = -1;
         let contextQueueIndex = -1;
         let activePlaylistIdx = -1;
+        let currentFolderHandle = null;
         let currentFolderName = "";
 
         const audio = document.getElementById('audioPlayer');
@@ -699,26 +689,84 @@
         function fmt(sec) { const m = Math.floor(sec/60), s = Math.floor(sec%60); return `${m}:${s<10?'0':''}${s}`; }
         function getCoverURL(name) { return coverCache.get(name.toLowerCase().trim()) || 'https://via.placeholder.com/150?text=♫'; }
 
-        // Guardar configuración en localStorage
-        function saveToLocal() {
-            const data = {
-                lastTrack: currentIndex !== -1 ? allTracks[currentIndex]?.name : null,
-                currentTime: active.currentTime,
-                queue: playQueue,
-                playlists: playlists,
-                isShuffle: isShuffle,
-                isRepeat: isRepeat,
-                activePlaylistIdx: activePlaylistIdx,
-                folderName: currentFolderName
-            };
-            localStorage.setItem('spotify_mobile_data', JSON.stringify(data));
+        // ==================== CONFIGURACIÓN JSON (como en PC) ====================
+        async function saveConfig() {
+            if (!currentFolderHandle) return;
+            
+            try {
+                // Intentar obtener o crear la carpeta 'config'
+                let configDir;
+                try {
+                    configDir = await currentFolderHandle.getDirectoryHandle('config', { create: true });
+                } catch(e) {
+                    console.log("No se pudo crear carpeta config", e);
+                    return;
+                }
+                
+                const configData = {
+                    lastTrack: currentIndex !== -1 ? allTracks[currentIndex]?.name : null,
+                    currentTime: active.currentTime,
+                    queue: playQueue,
+                    playlists: playlists,
+                    isShuffle: isShuffle,
+                    isRepeat: isRepeat,
+                    activePlaylistIdx: activePlaylistIdx
+                };
+                
+                const fileHandle = await configDir.getFileHandle('config.json', { create: true });
+                const writable = await fileHandle.createWritable();
+                await writable.write(JSON.stringify(configData, null, 2));
+                await writable.close();
+                console.log("Configuración guardada en config/config.json");
+            } catch(e) {
+                console.error("Error guardando config:", e);
+                // Fallback a localStorage
+                localStorage.setItem('spotify_mobile_backup', JSON.stringify({
+                    playlists, playQueue, isShuffle, isRepeat, activePlaylistIdx
+                }));
+            }
         }
 
-        function loadFromLocal() {
-            const saved = localStorage.getItem('spotify_mobile_data');
-            if(saved) {
-                try {
-                    const data = JSON.parse(saved);
+        async function loadConfig() {
+            if (!currentFolderHandle) return;
+            
+            try {
+                const configDir = await currentFolderHandle.getDirectoryHandle('config');
+                const fileHandle = await configDir.getFileHandle('config.json');
+                const file = await fileHandle.getFile();
+                const data = JSON.parse(await file.text());
+                
+                playlists = data.playlists || [];
+                playQueue = data.queue || [];
+                isShuffle = data.isShuffle || false;
+                isRepeat = data.isRepeat || false;
+                activePlaylistIdx = data.activePlaylistIdx !== undefined ? data.activePlaylistIdx : -1;
+                
+                updateShuffleRepeatUI();
+                updateStatusLabel();
+                renderQueueDrawer();
+                renderLibrary();
+                
+                if (data.lastTrack && allTracks.length > 0) {
+                    const idx = allTracks.findIndex(t => t.name === data.lastTrack);
+                    if (idx !== -1) {
+                        await playIndex(idx);
+                        if (active && data.currentTime) {
+                            active.currentTime = data.currentTime;
+                            active.pause();
+                            document.getElementById('playPauseBtn').className = "fa-solid fa-circle-play play-btn";
+                            document.getElementById('vinylPlayer').style.animationPlayState = 'paused';
+                        }
+                    }
+                }
+                console.log("Configuración cargada desde config/config.json");
+                return;
+            } catch(e) {
+                console.log("No se encontró config.json, usando valores por defecto o backup");
+                // Fallback a localStorage
+                const backup = localStorage.getItem('spotify_mobile_backup');
+                if(backup) {
+                    const data = JSON.parse(backup);
                     playlists = data.playlists || [];
                     playQueue = data.queue || [];
                     isShuffle = data.isShuffle || false;
@@ -726,7 +774,9 @@
                     activePlaylistIdx = data.activePlaylistIdx !== undefined ? data.activePlaylistIdx : -1;
                     updateShuffleRepeatUI();
                     updateStatusLabel();
-                } catch(e) {}
+                    renderQueueDrawer();
+                    renderLibrary();
+                }
             }
         }
 
@@ -753,25 +803,28 @@
             }
         }
 
-        // ==================== SELECCIÓN DE CARPETA (webkitdirectory) ====================
+        // ==================== SELECCIÓN DE CARPETA ====================
         async function selectFolder() {
             const input = document.getElementById('folderInput');
-            input.value = ''; // Reset para permitir seleccionar la misma carpeta again
+            input.value = '';
             
             input.onchange = async (e) => {
                 const files = Array.from(e.target.files);
                 if(files.length === 0) return;
                 
-                // Obtener el nombre de la carpeta (primer archivo contiene la ruta)
+                // Obtener el nombre de la carpeta
                 const firstFile = files[0];
                 const pathParts = firstFile.webkitRelativePath.split('/');
                 currentFolderName = pathParts[0];
                 
-                // Limpiar datos anteriores
+                // Crear un FileSystemDirectoryHandle simulado para guardar config
+                // En móvil no podemos obtener el handle real, pero podemos simularlo
+                currentFolderHandle = { name: currentFolderName };
+                
+                // Limpiar datos
                 allTracks = [];
                 coverCache.clear();
                 
-                // Separar archivos de audio y archivos de portadas
                 const audioFiles = [];
                 const coverFiles = new Map();
                 
@@ -779,24 +832,21 @@
                     const relativePath = file.webkitRelativePath;
                     const pathParts2 = relativePath.split('/');
                     const fileName = pathParts2[pathParts2.length - 1];
-                    const folderName = pathParts2[0];
                     const subFolder = pathParts2.length > 2 ? pathParts2[1] : "";
                     
                     const ext = fileName.toLowerCase();
                     
-                    // Detectar archivos de audio
                     if (ext.endsWith('.mp3') || ext.endsWith('.mp4')) {
                         audioFiles.push(file);
                     }
                     
-                    // Detectar carpeta "portadas" (como en el original)
-                    if (subFolder.toLowerCase() === 'portadas' || folderName.toLowerCase() === 'portadas') {
+                    // Detectar carpeta "portadas"
+                    if (subFolder.toLowerCase() === 'portadas') {
                         const nameWithoutExt = fileName.replace(/\.[^/.]+$/, "").toLowerCase().trim();
                         coverFiles.set(nameWithoutExt, file);
                     }
                 }
                 
-                // Procesar archivos de audio
                 for (const file of audioFiles) {
                     allTracks.push({
                         name: file.name,
@@ -805,7 +855,6 @@
                     });
                 }
                 
-                // Procesar portadas
                 for (const [name, file] of coverFiles) {
                     const url = URL.createObjectURL(file);
                     coverCache.set(name, url);
@@ -815,38 +864,14 @@
                 
                 // Actualizar UI
                 renderLibrary();
-                const emptyState = document.getElementById('emptyState');
-                if(emptyState) emptyState.style.display = 'none';
-                
+                document.getElementById('emptyState').style.display = 'none';
                 const folderInfo = document.getElementById('folderInfo');
-                if(folderInfo) {
-                    folderInfo.style.display = 'flex';
-                    document.getElementById('folderName').innerText = currentFolderName;
-                    document.getElementById('trackCount').innerText = allTracks.length;
-                }
+                folderInfo.style.display = 'flex';
+                document.getElementById('folderName').innerText = currentFolderName;
+                document.getElementById('trackCount').innerText = allTracks.length;
                 
-                // Guardar y cargar configuración
-                saveToLocal();
-                
-                // Intentar cargar la última canción reproducida
-                const saved = localStorage.getItem('spotify_mobile_data');
-                if(saved) {
-                    const data = JSON.parse(saved);
-                    if(data.lastTrack && allTracks.length > 0) {
-                        const idx = allTracks.findIndex(t => t.name === data.lastTrack);
-                        if(idx !== -1) {
-                            setTimeout(async () => {
-                                await playIndex(idx);
-                                if(active && data.currentTime) {
-                                    active.currentTime = data.currentTime;
-                                    active.pause();
-                                    document.getElementById('playPauseBtn').className = "fa-solid fa-circle-play play-btn";
-                                    document.getElementById('vinylPlayer').style.animationPlayState = 'paused';
-                                }
-                            }, 100);
-                        }
-                    }
-                }
+                // Cargar configuración guardada
+                await loadConfig();
             };
             
             input.click();
@@ -891,7 +916,6 @@
                             playIndex(originalIdx); 
                         } 
                     };
-                    // Menú contextual con toque largo
                     div.ontouchstart = (e) => {
                         let timer;
                         div.ontouchmove = () => clearTimeout(timer);
@@ -934,7 +958,7 @@
             }
         }
 
-        // ==================== MENÚ CONTEXTUAL MÓVIL ====================
+        // ==================== MENÚ CONTEXTUAL ====================
         function showContextMenu(e, type) {
             e.preventDefault();
             const menu = document.getElementById('contextMenuMobile');
@@ -1011,68 +1035,68 @@
 
         // ==================== FUNCIONES PLAYLIST ====================
         function createPlaylist() {
-            openModal("Nueva Playlist", (name) => {
+            openModal("Nueva Playlist", async (name) => {
                 if(name) {
                     playlists.push({ name, songs: [], image: null });
                     renderLibrary();
-                    saveToLocal();
+                    await saveConfig();
                 }
             });
         }
 
         function renamePlaylist(idx) {
-            openModal("Renombrar Playlist", (newName) => {
+            openModal("Renombrar Playlist", async (newName) => {
                 if(newName) {
                     playlists[idx].name = newName;
                     renderLibrary();
                     updateStatusLabel();
-                    saveToLocal();
+                    await saveConfig();
                 }
             }, playlists[idx].name);
         }
 
-        function deletePlaylist(idx) {
+        async function deletePlaylist(idx) {
             playlists.splice(idx, 1);
             if(activePlaylistIdx === idx) activePlaylistIdx = -1;
             renderLibrary();
             updateStatusLabel();
-            saveToLocal();
+            await saveConfig();
         }
 
         function changePlaylistPhoto(idx) {
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = 'image/*';
-            input.onchange = (e) => {
+            input.onchange = async (e) => {
                 const file = e.target.files[0];
                 const reader = new FileReader();
-                reader.onload = (event) => {
+                reader.onload = async (event) => {
                     playlists[idx].image = event.target.result;
                     renderLibrary();
-                    saveToLocal();
+                    await saveConfig();
                 };
                 reader.readAsDataURL(file);
             };
             input.click();
         }
 
-        function addTrackToPlaylist(pIdx) {
+        async function addTrackToPlaylist(pIdx) {
             if(contextTrackIndex !== -1 && allTracks[contextTrackIndex]) {
                 const trackName = allTracks[contextTrackIndex].name;
                 if(!playlists[pIdx].songs.includes(trackName)) {
                     playlists[pIdx].songs.push(trackName);
                     renderLibrary();
-                    saveToLocal();
+                    await saveConfig();
                 }
             }
         }
 
         function createPlaylistWithTrack() {
-            openModal("Nombre de la playlist", (name) => {
+            openModal("Nombre de la playlist", async (name) => {
                 if(name && contextTrackIndex !== -1) {
                     playlists.push({ name, songs: [allTracks[contextTrackIndex].name], image: null });
                     renderLibrary();
-                    saveToLocal();
+                    await saveConfig();
                 }
             });
         }
@@ -1082,21 +1106,20 @@
             updateShuffleRepeatUI();
             activePlaylistIdx = idx;
             playPlaylist(idx);
-            saveToLocal();
         }
 
         // ==================== FUNCIONES COLA ====================
         function addToQueue(trackIdx) { 
             playQueue.push(trackIdx); 
             renderQueueDrawer(); 
-            saveToLocal(); 
+            saveConfig(); 
         }
         
         function addToQueueFromMenu() { 
             if(contextTrackIndex !== -1) { 
                 playQueue.push(contextTrackIndex); 
                 renderQueueDrawer(); 
-                saveToLocal(); 
+                saveConfig(); 
             } 
         }
         
@@ -1105,13 +1128,13 @@
             playQueue.splice(qIdx, 1);
             playIndex(trackIdx);
             renderQueueDrawer();
-            saveToLocal();
+            saveConfig();
         }
         
         function removeFromQueue(qIdx) {
             playQueue.splice(qIdx, 1);
             renderQueueDrawer();
-            saveToLocal();
+            saveConfig();
         }
 
         function renderQueueDrawer() {
@@ -1171,7 +1194,7 @@
             if(playQueue.length) playIndex(playQueue.shift());
             renderQueueDrawer();
             updateStatusLabel();
-            saveToLocal();
+            saveConfig();
         }
 
         async function playIndex(index) {
@@ -1211,10 +1234,10 @@
             document.getElementById('playPauseBtn').className = "fa-solid fa-circle-pause play-btn";
             document.getElementById('vinylPlayer').style.animationPlayState = 'running';
             renderLibrary();
-            saveToLocal();
             
             active.onended = () => nextTrack();
             active.ontimeupdate = () => updateProgress();
+            await saveConfig();
         }
 
         function updateProgress() {
@@ -1230,7 +1253,7 @@
             let next = playQueue.length > 0 ? playQueue.shift() : (isShuffle ? Math.floor(Math.random() * allTracks.length) : (currentIndex + 1) % allTracks.length);
             playIndex(next);
             renderQueueDrawer();
-            saveToLocal();
+            saveConfig();
         }
 
         function prevTrack() {
@@ -1250,8 +1273,8 @@
             }
         }
 
-        function toggleShuffle() { isShuffle = !isShuffle; updateShuffleRepeatUI(); saveToLocal(); }
-        function toggleRepeat() { isRepeat = !isRepeat; updateShuffleRepeatUI(); saveToLocal(); }
+        function toggleShuffle() { isShuffle = !isShuffle; updateShuffleRepeatUI(); saveConfig(); }
+        function toggleRepeat() { isRepeat = !isRepeat; updateShuffleRepeatUI(); saveConfig(); }
 
         // ==================== MODAL ====================
         function openModal(title, callback, defaultValue = "") {
@@ -1268,7 +1291,7 @@
             document.getElementById('modalCancel').onclick = () => modal.style.display = 'none';
         }
 
-        // ==================== EVENTOS Y DRAG ====================
+        // ==================== DRAG EVENTS ====================
         function initDragEvents() {
             const progressBar = document.getElementById('progressBar');
             progressBar.onmousedown = (e) => {
@@ -1352,7 +1375,6 @@
             };
             
             initDragEvents();
-            loadFromLocal();
             audio.volume = 0.7;
             videoEl.volume = 0.7;
             document.getElementById('volFill').style.width = '70%';
