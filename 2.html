@@ -119,12 +119,12 @@
         .content {
             flex: 1;
             overflow-y: auto;
-            padding: 8px 16px;
+            padding: 6px 16px;
             -webkit-overflow-scrolling: touch;
         }
 
         .greeting {
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .greeting h2 {
@@ -140,7 +140,7 @@
         .track-list, .playlist-list {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 5px;
         }
 
         .track-item, .playlist-item {
@@ -539,60 +539,27 @@
             align-items: center;
         }
 
-        /* Modal de visualización de vinilo/video a tamaño completo */
-        .fullscreen-media {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.95);
-            z-index: 400;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-        }
-
-        .fullscreen-media.active {
+        /* Vinilo */
+        .media-area {
             display: flex;
+            justify-content: center;
+            margin: 5px 0;
         }
 
-        .fullscreen-vinyl {
-            width: min(280px, 70vw);
-            height: min(280px, 70vw);
+        .vinyl-player {
+            width: min(140px, 30vw);
+            height: min(140px, 30vw);
             border-radius: 50%;
-            border: 6px solid #282828;
+            border: 4px solid #282828;
             overflow: hidden;
             animation: spin 15s linear infinite;
+            display: none;
         }
 
-        .fullscreen-vinyl img {
+        .vinyl-player img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-        }
-
-        .fullscreen-video {
-            width: 90%;
-            max-height: 80%;
-            border-radius: 16px;
-        }
-
-        .close-fullscreen {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 1.8rem;
-            color: white;
-            cursor: pointer;
-            background: rgba(0,0,0,0.5);
-            width: 44px;
-            height: 44px;
-            border-radius: 22px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         @keyframes spin {
@@ -648,36 +615,54 @@
             justify-content: center;
         }
 
-        /* Área de video/vinilo en línea */
-        .media-area {
-            display: flex;
+        /* Fullscreen para vinilo */
+        .fullscreen-media {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 400;
+            display: none;
+            align-items: center;
             justify-content: center;
-            margin: 5px 0;
+            flex-direction: column;
         }
 
-        .vinyl-player {
-            width: min(160px, 35vw);
-            height: min(160px, 35vw);
+        .fullscreen-media.active {
+            display: flex;
+        }
+
+        .fullscreen-vinyl {
+            width: min(280px, 70vw);
+            height: min(280px, 70vw);
             border-radius: 50%;
-            border: 4px solid #282828;
+            border: 6px solid #282828;
             overflow: hidden;
             animation: spin 15s linear infinite;
-            display: none;
         }
 
-        .vinyl-player img {
+        .fullscreen-vinyl img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        #inlineVideo {
-            width: 100%;
-            max-height: 160px;
-            border-radius: 12px;
-            display: none;
-            object-fit: contain;
-            background: #000;
+        .close-fullscreen {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.8rem;
+            color: white;
+            cursor: pointer;
+            background: rgba(0,0,0,0.5);
+            width: 44px;
+            height: 44px;
+            border-radius: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
     </style>
 </head>
@@ -716,7 +701,6 @@
                 <div class="vinyl-player" id="vinylPlayer">
                     <img id="vinylImg" src="">
                 </div>
-                <video id="inlineVideo" playsinline webkit-playsinline controls></video>
             </div>
             <div id="trackListContainer" class="track-list"></div>
             <div id="playlistListContainer" class="playlist-list" style="display:none;"></div>
@@ -724,7 +708,7 @@
                 <i class="fa-solid fa-folder-tree"></i>
                 <p>Toca el botón verde + para seleccionar una CARPETA</p>
                 <p style="font-size:11px; margin-top:6px;">Selecciona una carpeta con música MP3/MP4</p>
-                <p style="font-size:10px; margin-top:6px; color:#1db954;">La configuración se guarda automáticamente en config.json</p>
+                <p style="font-size:10px; margin-top:6px; color:#1db954;">La configuración se guarda automáticamente</p>
             </div>
         </div>
 
@@ -788,10 +772,9 @@
         <div class="close-fullscreen" id="closeFullscreen">
             <i class="fa-solid fa-xmark"></i>
         </div>
-        <div id="fullscreenVinyl" class="fullscreen-vinyl" style="display:none;">
+        <div id="fullscreenVinyl" class="fullscreen-vinyl">
             <img id="fullscreenVinylImg" src="">
         </div>
-        <video id="fullscreenVideo" class="fullscreen-video" controls playsinline style="display:none;"></video>
     </div>
 
     <div class="fab" id="fabBtn">
@@ -824,12 +807,9 @@
         let currentTab = 'lib';
         let activePlaylistIdx = -1;
         let currentFolderName = "";
-        let currentFolderHandle = null;
         let pendingTrackForPlaylist = null;
-        let currentFolderFiles = null; // Guardar referencia a los archivos para poder recuperar
 
         const audio = document.getElementById('audioPlayer');
-        const inlineVideo = document.getElementById('inlineVideo');
         let active = audio;
 
         // ==================== FUNCIONES AUXILIARES ====================
@@ -843,54 +823,25 @@
             return coverCache.get(name.toLowerCase().trim()) || 'https://via.placeholder.com/150?text=♫'; 
         }
 
-        // ==================== CONFIGURACIÓN JSON (GUARDADO EN LA CARPETA) ====================
+        // ==================== CONFIGURACIÓN (PERSISTENCIA) ====================
         async function saveConfig() {
-            if (!currentFolderHandle || !currentFolderFiles) {
-                // Fallback a localStorage
-                localStorage.setItem('spotify_mobile_backup', JSON.stringify({
-                    playlists, playQueue, isShuffle, isRepeat, activePlaylistIdx, folderName: currentFolderName
-                }));
-                return;
-            }
-            
-            try {
-                // Buscar o crear carpeta config
-                let configDir = null;
-                for (const file of currentFolderFiles) {
-                    if (file.webkitRelativePath.split('/')[1] === 'config') {
-                        configDir = true;
-                        break;
-                    }
-                }
-                
-                // Crear archivo config.json en la raíz de la carpeta seleccionada
-                const configData = {
-                    version: "1.0",
-                    lastTrack: currentIndex !== -1 ? allTracks[currentIndex]?.name : null,
-                    currentTime: active.currentTime || 0,
-                    queue: playQueue,
-                    playlists: playlists,
-                    isShuffle: isShuffle,
-                    isRepeat: isRepeat,
-                    activePlaylistIdx: activePlaylistIdx,
-                    folderName: currentFolderName,
-                    savedAt: new Date().toISOString()
-                };
-                
-                // Guardar en localStorage como respaldo y también intentar guardar como archivo
-                localStorage.setItem(`spotify_config_${currentFolderName}`, JSON.stringify(configData));
-                localStorage.setItem('spotify_mobile_backup', JSON.stringify(configData));
-                console.log("Configuración guardada en localStorage y backup");
-            } catch(e) {
-                console.error("Error guardando config:", e);
-                localStorage.setItem('spotify_mobile_backup', JSON.stringify({
-                    playlists, playQueue, isShuffle, isRepeat, activePlaylistIdx, folderName: currentFolderName
-                }));
-            }
+            const configData = {
+                version: "1.0",
+                lastTrack: currentIndex !== -1 ? allTracks[currentIndex]?.name : null,
+                currentTime: active.currentTime || 0,
+                queue: playQueue,
+                playlists: playlists,
+                isShuffle: isShuffle,
+                isRepeat: isRepeat,
+                activePlaylistIdx: activePlaylistIdx,
+                folderName: currentFolderName,
+                savedAt: new Date().toISOString()
+            };
+            localStorage.setItem(`spotify_config_${currentFolderName || 'default'}`, JSON.stringify(configData));
+            localStorage.setItem('spotify_mobile_backup', JSON.stringify(configData));
         }
 
         async function loadConfig() {
-            // Intentar cargar desde localStorage primero con el nombre de la carpeta
             if (currentFolderName) {
                 const saved = localStorage.getItem(`spotify_config_${currentFolderName}`);
                 if (saved) {
@@ -924,7 +875,6 @@
                 }
             }
             
-            // Fallback a backup general
             const backup = localStorage.getItem('spotify_mobile_backup');
             if(backup) {
                 try {
@@ -973,11 +923,9 @@
                 const files = Array.from(e.target.files);
                 if(files.length === 0) return;
                 
-                currentFolderFiles = files;
                 const firstFile = files[0];
                 const pathParts = firstFile.webkitRelativePath.split('/');
                 currentFolderName = pathParts[0];
-                currentFolderHandle = { name: currentFolderName };
                 
                 allTracks = [];
                 coverCache.clear();
@@ -1292,30 +1240,15 @@
         }
 
         function showFullscreenMedia() {
-            const isVideoPlaying = active === inlineVideo && inlineVideo.style.display !== 'none' && inlineVideo.src;
-            if(isVideoPlaying && inlineVideo.src) {
-                const fullVideo = document.getElementById('fullscreenVideo');
-                fullVideo.src = inlineVideo.src;
-                fullVideo.currentTime = inlineVideo.currentTime;
-                fullVideo.style.display = 'block';
-                document.getElementById('fullscreenVinyl').style.display = 'none';
-                if(!inlineVideo.paused) fullVideo.play();
+            const imgUrl = document.getElementById('playerCover').src;
+            if(imgUrl && imgUrl !== 'https://via.placeholder.com/150?text=♫') {
+                document.getElementById('fullscreenVinylImg').src = imgUrl;
                 document.getElementById('fullscreenMedia').classList.add('active');
-            } else {
-                const imgUrl = document.getElementById('playerCover').src;
-                if(imgUrl && imgUrl !== 'https://via.placeholder.com/150?text=♫') {
-                    document.getElementById('fullscreenVinylImg').src = imgUrl;
-                    document.getElementById('fullscreenVinyl').style.display = 'flex';
-                    document.getElementById('fullscreenVideo').style.display = 'none';
-                    document.getElementById('fullscreenMedia').classList.add('active');
-                }
             }
         }
 
         function closeFullscreenMedia() {
             document.getElementById('fullscreenMedia').classList.remove('active');
-            const fullVideo = document.getElementById('fullscreenVideo');
-            if(fullVideo) fullVideo.pause();
         }
 
         async function playIndex(index) {
@@ -1336,28 +1269,15 @@
             document.getElementById('vinylImg').src = imgURL;
             
             audio.pause();
-            inlineVideo.pause();
             
             if(currentMediaURL) URL.revokeObjectURL(currentMediaURL);
             currentMediaURL = URL.createObjectURL(file);
             
-            const isVideo = file.name.toLowerCase().endsWith('.mp4') || file.name.toLowerCase().endsWith('.mov');
-            
-            if(isVideo) {
-                inlineVideo.src = currentMediaURL;
-                inlineVideo.style.display = 'block';
-                inlineVideo.controls = true;
-                inlineVideo.playsInline = true;
-                inlineVideo.play();
-                active = inlineVideo;
-                document.getElementById('vinylPlayer').style.display = 'none';
-            } else {
-                audio.src = currentMediaURL;
-                audio.play();
-                active = audio;
-                inlineVideo.style.display = 'none';
-                document.getElementById('vinylPlayer').style.display = 'block';
-            }
+            // Todos los archivos se reproducen como audio (MP4 solo audio)
+            audio.src = currentMediaURL;
+            audio.play();
+            active = audio;
+            document.getElementById('vinylPlayer').style.display = 'block';
             
             document.getElementById('playPauseBtn').className = "fa-solid fa-circle-pause play-btn";
             renderLibrary();
@@ -1462,7 +1382,6 @@
                     let pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
                     document.getElementById('volFill').style.width = (pct * 100) + '%';
                     audio.volume = pct;
-                    if(inlineVideo) inlineVideo.volume = pct;
                 };
                 const stop = () => { window.removeEventListener('mousemove', move); window.removeEventListener('mouseup', stop); };
                 window.addEventListener('mousemove', move);
@@ -1475,7 +1394,6 @@
                     let pct = Math.max(0, Math.min(1, (touch.clientX - rect.left) / rect.width));
                     document.getElementById('volFill').style.width = (pct * 100) + '%';
                     audio.volume = pct;
-                    if(inlineVideo) inlineVideo.volume = pct;
                 };
                 const stop = () => { window.removeEventListener('touchmove', move); window.removeEventListener('touchend', stop); };
                 window.addEventListener('touchmove', move, {passive: false});
@@ -1516,7 +1434,6 @@
             
             initDragEvents();
             audio.volume = 0.7;
-            if(inlineVideo) inlineVideo.volume = 0.7;
             document.getElementById('volFill').style.width = '70%';
         }
         
