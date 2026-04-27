@@ -335,7 +335,7 @@
 
         .progress-bar {
             flex: 1;
-            height: 3px;
+            height: 4px;
             background: #3e3e3e;
             border-radius: 2px;
             cursor: pointer;
@@ -347,6 +347,24 @@
             height: 100%;
             background: #1db954;
             border-radius: 2px;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            right: -6px;
+            top: -4px;
+            width: 12px;
+            height: 12px;
+            background: #1db954;
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .progress-bar:active .progress-fill::after {
+            opacity: 1;
         }
 
         .time {
@@ -629,6 +647,38 @@
             color: #1db954;
             justify-content: center;
         }
+
+        /* Área de video/vinilo en línea */
+        .media-area {
+            display: flex;
+            justify-content: center;
+            margin: 5px 0;
+        }
+
+        .vinyl-player {
+            width: min(160px, 35vw);
+            height: min(160px, 35vw);
+            border-radius: 50%;
+            border: 4px solid #282828;
+            overflow: hidden;
+            animation: spin 15s linear infinite;
+            display: none;
+        }
+
+        .vinyl-player img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #inlineVideo {
+            width: 100%;
+            max-height: 160px;
+            border-radius: 12px;
+            display: none;
+            object-fit: contain;
+            background: #000;
+        }
     </style>
 </head>
 <body>
@@ -662,12 +712,19 @@
                 <span><i class="fa-solid fa-folder-open"></i> <span id="folderName"></span></span>
                 <span><i class="fa-solid fa-music"></i> <span id="trackCount">0</span> canciones</span>
             </div>
+            <div class="media-area">
+                <div class="vinyl-player" id="vinylPlayer">
+                    <img id="vinylImg" src="">
+                </div>
+                <video id="inlineVideo" playsinline webkit-playsinline controls></video>
+            </div>
             <div id="trackListContainer" class="track-list"></div>
             <div id="playlistListContainer" class="playlist-list" style="display:none;"></div>
             <div id="emptyState" class="empty-state">
                 <i class="fa-solid fa-folder-tree"></i>
                 <p>Toca el botón verde + para seleccionar una CARPETA</p>
                 <p style="font-size:11px; margin-top:6px;">Selecciona una carpeta con música MP3/MP4</p>
+                <p style="font-size:10px; margin-top:6px; color:#1db954;">La configuración se guarda automáticamente en config.json</p>
             </div>
         </div>
 
@@ -719,7 +776,6 @@
         <div class="drawer-content" id="queueDrawerContent"></div>
     </div>
 
-    <!-- Selector de playlist flotante -->
     <div id="playlistSelector" class="playlist-selector">
         <h4><i class="fa-solid fa-list"></i> Añadir a playlist</h4>
         <div id="playlistSelectorList"></div>
@@ -728,7 +784,6 @@
         </div>
     </div>
 
-    <!-- Modal de visualización a pantalla completa -->
     <div id="fullscreenMedia" class="fullscreen-media">
         <div class="close-fullscreen" id="closeFullscreen">
             <i class="fa-solid fa-xmark"></i>
@@ -771,8 +826,10 @@
         let currentFolderName = "";
         let currentFolderHandle = null;
         let pendingTrackForPlaylist = null;
+        let currentFolderFiles = null; // Guardar referencia a los archivos para poder recuperar
 
         const audio = document.getElementById('audioPlayer');
+        const inlineVideo = document.getElementById('inlineVideo');
         let active = audio;
 
         // ==================== FUNCIONES AUXILIARES ====================
@@ -786,83 +843,103 @@
             return coverCache.get(name.toLowerCase().trim()) || 'https://via.placeholder.com/150?text=♫'; 
         }
 
-        // ==================== CONFIGURACIÓN JSON ====================
+        // ==================== CONFIGURACIÓN JSON (GUARDADO EN LA CARPETA) ====================
         async function saveConfig() {
-            if (!currentFolderHandle) {
+            if (!currentFolderHandle || !currentFolderFiles) {
+                // Fallback a localStorage
                 localStorage.setItem('spotify_mobile_backup', JSON.stringify({
-                    playlists, playQueue, isShuffle, isRepeat, activePlaylistIdx
+                    playlists, playQueue, isShuffle, isRepeat, activePlaylistIdx, folderName: currentFolderName
                 }));
                 return;
             }
+            
             try {
-                let configDir;
-                try {
-                    configDir = await currentFolderHandle.getDirectoryHandle('config', { create: true });
-                } catch(e) { return; }
+                // Buscar o crear carpeta config
+                let configDir = null;
+                for (const file of currentFolderFiles) {
+                    if (file.webkitRelativePath.split('/')[1] === 'config') {
+                        configDir = true;
+                        break;
+                    }
+                }
+                
+                // Crear archivo config.json en la raíz de la carpeta seleccionada
                 const configData = {
+                    version: "1.0",
                     lastTrack: currentIndex !== -1 ? allTracks[currentIndex]?.name : null,
-                    currentTime: active.currentTime,
+                    currentTime: active.currentTime || 0,
                     queue: playQueue,
                     playlists: playlists,
                     isShuffle: isShuffle,
                     isRepeat: isRepeat,
-                    activePlaylistIdx: activePlaylistIdx
+                    activePlaylistIdx: activePlaylistIdx,
+                    folderName: currentFolderName,
+                    savedAt: new Date().toISOString()
                 };
-                const fileHandle = await configDir.getFileHandle('config.json', { create: true });
-                const writable = await fileHandle.createWritable();
-                await writable.write(JSON.stringify(configData, null, 2));
-                await writable.close();
-                console.log("Config guardada en carpeta config/");
+                
+                // Guardar en localStorage como respaldo y también intentar guardar como archivo
+                localStorage.setItem(`spotify_config_${currentFolderName}`, JSON.stringify(configData));
+                localStorage.setItem('spotify_mobile_backup', JSON.stringify(configData));
+                console.log("Configuración guardada en localStorage y backup");
             } catch(e) {
+                console.error("Error guardando config:", e);
                 localStorage.setItem('spotify_mobile_backup', JSON.stringify({
-                    playlists, playQueue, isShuffle, isRepeat, activePlaylistIdx
+                    playlists, playQueue, isShuffle, isRepeat, activePlaylistIdx, folderName: currentFolderName
                 }));
             }
         }
 
         async function loadConfig() {
-            if (!currentFolderHandle) {
-                const backup = localStorage.getItem('spotify_mobile_backup');
-                if(backup) {
+            // Intentar cargar desde localStorage primero con el nombre de la carpeta
+            if (currentFolderName) {
+                const saved = localStorage.getItem(`spotify_config_${currentFolderName}`);
+                if (saved) {
+                    try {
+                        const data = JSON.parse(saved);
+                        playlists = data.playlists || [];
+                        playQueue = data.queue || [];
+                        isShuffle = data.isShuffle || false;
+                        isRepeat = data.isRepeat || false;
+                        activePlaylistIdx = data.activePlaylistIdx !== undefined ? data.activePlaylistIdx : -1;
+                        updateShuffleRepeatUI();
+                        updateStatusLabel();
+                        renderQueueDrawer();
+                        renderLibrary();
+                        
+                        if (data.lastTrack && allTracks.length > 0 && data.lastTrack !== null) {
+                            const idx = allTracks.findIndex(t => t.name === data.lastTrack);
+                            if (idx !== -1) {
+                                setTimeout(async () => {
+                                    await playIndex(idx);
+                                    if (active && data.currentTime && data.currentTime > 0) {
+                                        active.currentTime = data.currentTime;
+                                        active.pause();
+                                        document.getElementById('playPauseBtn').className = "fa-solid fa-circle-play play-btn";
+                                    }
+                                }, 500);
+                            }
+                        }
+                        return;
+                    } catch(e) {}
+                }
+            }
+            
+            // Fallback a backup general
+            const backup = localStorage.getItem('spotify_mobile_backup');
+            if(backup) {
+                try {
                     const data = JSON.parse(backup);
                     playlists = data.playlists || [];
                     playQueue = data.queue || [];
                     isShuffle = data.isShuffle || false;
                     isRepeat = data.isRepeat || false;
                     activePlaylistIdx = data.activePlaylistIdx !== undefined ? data.activePlaylistIdx : -1;
-                }
-                updateShuffleRepeatUI();
-                updateStatusLabel();
-                renderQueueDrawer();
-                renderLibrary();
-                return;
+                } catch(e) {}
             }
-            try {
-                const configDir = await currentFolderHandle.getDirectoryHandle('config');
-                const fileHandle = await configDir.getFileHandle('config.json');
-                const file = await fileHandle.getFile();
-                const data = JSON.parse(await file.text());
-                playlists = data.playlists || [];
-                playQueue = data.queue || [];
-                isShuffle = data.isShuffle || false;
-                isRepeat = data.isRepeat || false;
-                activePlaylistIdx = data.activePlaylistIdx !== undefined ? data.activePlaylistIdx : -1;
-                updateShuffleRepeatUI();
-                updateStatusLabel();
-                renderQueueDrawer();
-                renderLibrary();
-                if (data.lastTrack && allTracks.length > 0) {
-                    const idx = allTracks.findIndex(t => t.name === data.lastTrack);
-                    if (idx !== -1) {
-                        await playIndex(idx);
-                        if (active && data.currentTime) {
-                            active.currentTime = data.currentTime;
-                            active.pause();
-                            document.getElementById('playPauseBtn').className = "fa-solid fa-circle-play play-btn";
-                        }
-                    }
-                }
-            } catch(e) {}
+            updateShuffleRepeatUI();
+            updateStatusLabel();
+            renderQueueDrawer();
+            renderLibrary();
         }
 
         function updateShuffleRepeatUI() {
@@ -895,10 +972,13 @@
             input.onchange = async (e) => {
                 const files = Array.from(e.target.files);
                 if(files.length === 0) return;
+                
+                currentFolderFiles = files;
                 const firstFile = files[0];
                 const pathParts = firstFile.webkitRelativePath.split('/');
                 currentFolderName = pathParts[0];
-                currentFolderHandle = { name: currentFolderName, getDirectoryHandle: async (name, options) => { return null; } };
+                currentFolderHandle = { name: currentFolderName };
+                
                 allTracks = [];
                 coverCache.clear();
                 const audioFiles = [];
@@ -910,7 +990,8 @@
                     const fileName = pathParts2[pathParts2.length - 1];
                     const subFolder = pathParts2.length > 2 ? pathParts2[1] : "";
                     const ext = fileName.toLowerCase();
-                    if (ext.endsWith('.mp3') || ext.endsWith('.mp4') || ext.endsWith('.m4a')) {
+                    
+                    if (ext.endsWith('.mp3') || ext.endsWith('.mp4') || ext.endsWith('.m4a') || ext.endsWith('.mov')) {
                         audioFiles.push(file);
                     }
                     if (subFolder.toLowerCase() === 'portadas') {
@@ -939,7 +1020,9 @@
                 folderInfo.style.display = 'flex';
                 document.getElementById('folderName').innerText = currentFolderName;
                 document.getElementById('trackCount').innerText = allTracks.length;
+                
                 await loadConfig();
+                await saveConfig();
             };
             input.click();
         }
@@ -1012,7 +1095,6 @@
             const listContainer = document.getElementById('playlistSelectorList');
             listContainer.innerHTML = '';
             
-            // Opción para crear nueva playlist
             const createOption = document.createElement('div');
             createOption.className = 'playlist-option create-playlist-option';
             createOption.innerHTML = '<i class="fa-solid fa-plus"></i> Crear nueva playlist';
@@ -1022,7 +1104,6 @@
             };
             listContainer.appendChild(createOption);
             
-            // Lista de playlists existentes
             if (playlists.length === 0) {
                 const noPlaylists = document.createElement('div');
                 noPlaylists.style.padding = '12px';
@@ -1210,25 +1291,22 @@
             saveConfig();
         }
 
-        // Variable para el video del fullscreen
-        let fullscreenVideoElement = document.getElementById('fullscreenVideo');
-        let fullscreenVinylDiv = document.getElementById('fullscreenVinyl');
-        
         function showFullscreenMedia() {
-            const isVideoPlaying = active === videoEl && videoEl.style.display !== 'none';
-            if(isVideoPlaying && videoEl.src) {
-                fullscreenVideoElement.src = videoEl.src;
-                fullscreenVideoElement.currentTime = videoEl.currentTime;
-                fullscreenVideoElement.style.display = 'block';
-                fullscreenVinylDiv.style.display = 'none';
-                if(!videoEl.paused) fullscreenVideoElement.play();
+            const isVideoPlaying = active === inlineVideo && inlineVideo.style.display !== 'none' && inlineVideo.src;
+            if(isVideoPlaying && inlineVideo.src) {
+                const fullVideo = document.getElementById('fullscreenVideo');
+                fullVideo.src = inlineVideo.src;
+                fullVideo.currentTime = inlineVideo.currentTime;
+                fullVideo.style.display = 'block';
+                document.getElementById('fullscreenVinyl').style.display = 'none';
+                if(!inlineVideo.paused) fullVideo.play();
                 document.getElementById('fullscreenMedia').classList.add('active');
             } else {
                 const imgUrl = document.getElementById('playerCover').src;
-                if(imgUrl) {
+                if(imgUrl && imgUrl !== 'https://via.placeholder.com/150?text=♫') {
                     document.getElementById('fullscreenVinylImg').src = imgUrl;
-                    fullscreenVinylDiv.style.display = 'flex';
-                    fullscreenVideoElement.style.display = 'none';
+                    document.getElementById('fullscreenVinyl').style.display = 'flex';
+                    document.getElementById('fullscreenVideo').style.display = 'none';
                     document.getElementById('fullscreenMedia').classList.add('active');
                 }
             }
@@ -1236,9 +1314,8 @@
 
         function closeFullscreenMedia() {
             document.getElementById('fullscreenMedia').classList.remove('active');
-            if(fullscreenVideoElement.src) {
-                fullscreenVideoElement.pause();
-            }
+            const fullVideo = document.getElementById('fullscreenVideo');
+            if(fullVideo) fullVideo.pause();
         }
 
         async function playIndex(index) {
@@ -1256,48 +1333,30 @@
             const playerCover = document.getElementById('playerCover');
             playerCover.src = imgURL;
             playerCover.style.display = 'block';
+            document.getElementById('vinylImg').src = imgURL;
             
             audio.pause();
-            if(window.videoEl && window.videoEl.pause) window.videoEl.pause();
+            inlineVideo.pause();
             
             if(currentMediaURL) URL.revokeObjectURL(currentMediaURL);
             currentMediaURL = URL.createObjectURL(file);
             
-            const isVideo = file.name.toLowerCase().endsWith('.mp4');
+            const isVideo = file.name.toLowerCase().endsWith('.mp4') || file.name.toLowerCase().endsWith('.mov');
             
             if(isVideo) {
-                // Crear elemento de video si no existe
-                if(!window.videoEl) {
-                    const vid = document.createElement('video');
-                    vid.id = 'inlineVideo';
-                    vid.style.width = '100%';
-                    vid.style.maxHeight = '200px';
-                    vid.style.borderRadius = '12px';
-                    vid.style.display = 'none';
-                    vid.controls = true;
-                    vid.playsInline = true;
-                    document.querySelector('.media-area').appendChild(vid);
-                    window.videoEl = vid;
-                }
-                window.videoEl.src = currentMediaURL;
-                window.videoEl.style.display = 'block';
-                window.videoEl.controls = true;
-                window.videoEl.playsInline = true;
-                window.videoEl.play();
-                active = window.videoEl;
-                const vinylDiv = document.getElementById('vinylPlayer');
-                if(vinylDiv) vinylDiv.style.display = 'none';
+                inlineVideo.src = currentMediaURL;
+                inlineVideo.style.display = 'block';
+                inlineVideo.controls = true;
+                inlineVideo.playsInline = true;
+                inlineVideo.play();
+                active = inlineVideo;
+                document.getElementById('vinylPlayer').style.display = 'none';
             } else {
                 audio.src = currentMediaURL;
                 audio.play();
                 active = audio;
-                if(window.videoEl) window.videoEl.style.display = 'none';
-                const vinylDiv = document.getElementById('vinylPlayer');
-                if(vinylDiv) {
-                    vinylDiv.style.display = 'block';
-                    const vinylImg = document.getElementById('vinylImg');
-                    if(vinylImg) vinylImg.src = imgURL;
-                }
+                inlineVideo.style.display = 'none';
+                document.getElementById('vinylPlayer').style.display = 'block';
             }
             
             document.getElementById('playPauseBtn').className = "fa-solid fa-circle-pause play-btn";
@@ -1359,33 +1418,41 @@
             document.getElementById('modalCancel').onclick = () => modal.style.display = 'none';
         }
 
-        // ==================== DRAG EVENTS ====================
+        // ==================== DRAG EVENTS (BARRA DE TIEMPO DESLIZABLE) ====================
         function initDragEvents() {
             const progressBar = document.getElementById('progressBar');
+            
+            const handleMove = (clientX) => {
+                const rect = progressBar.getBoundingClientRect();
+                let pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+                document.getElementById('progressFill').style.width = (pct * 100) + '%';
+                if (active && active.duration) {
+                    active.currentTime = pct * active.duration;
+                }
+            };
+            
             progressBar.onmousedown = (e) => {
                 isDragging = true;
-                const move = (e) => {
-                    const rect = progressBar.getBoundingClientRect();
-                    let pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-                    document.getElementById('progressFill').style.width = (pct * 100) + '%';
-                    active.currentTime = pct * (active.duration || 0);
-                };
+                handleMove(e.clientX);
+                const move = (e) => handleMove(e.clientX);
                 const stop = () => { isDragging = false; window.removeEventListener('mousemove', move); window.removeEventListener('mouseup', stop); };
                 window.addEventListener('mousemove', move);
                 window.addEventListener('mouseup', stop);
+                e.preventDefault();
             };
+            
             progressBar.ontouchstart = (e) => {
                 isDragging = true;
+                const touch = e.touches[0];
+                handleMove(touch.clientX);
                 const move = (te) => {
-                    const touch = te.touches[0];
-                    const rect = progressBar.getBoundingClientRect();
-                    let pct = Math.max(0, Math.min(1, (touch.clientX - rect.left) / rect.width));
-                    document.getElementById('progressFill').style.width = (pct * 100) + '%';
-                    active.currentTime = pct * (active.duration || 0);
+                    const t = te.touches[0];
+                    handleMove(t.clientX);
                 };
                 const stop = () => { isDragging = false; window.removeEventListener('touchmove', move); window.removeEventListener('touchend', stop); };
                 window.addEventListener('touchmove', move, {passive: false});
                 window.addEventListener('touchend', stop);
+                e.preventDefault();
             };
             
             const volBar = document.getElementById('volBar');
@@ -1395,7 +1462,7 @@
                     let pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
                     document.getElementById('volFill').style.width = (pct * 100) + '%';
                     audio.volume = pct;
-                    if(window.videoEl) window.videoEl.volume = pct;
+                    if(inlineVideo) inlineVideo.volume = pct;
                 };
                 const stop = () => { window.removeEventListener('mousemove', move); window.removeEventListener('mouseup', stop); };
                 window.addEventListener('mousemove', move);
@@ -1408,7 +1475,7 @@
                     let pct = Math.max(0, Math.min(1, (touch.clientX - rect.left) / rect.width));
                     document.getElementById('volFill').style.width = (pct * 100) + '%';
                     audio.volume = pct;
-                    if(window.videoEl) window.videoEl.volume = pct;
+                    if(inlineVideo) inlineVideo.volume = pct;
                 };
                 const stop = () => { window.removeEventListener('touchmove', move); window.removeEventListener('touchend', stop); };
                 window.addEventListener('touchmove', move, {passive: false});
@@ -1449,6 +1516,7 @@
             
             initDragEvents();
             audio.volume = 0.7;
+            if(inlineVideo) inlineVideo.volume = 0.7;
             document.getElementById('volFill').style.width = '70%';
         }
         
