@@ -38,6 +38,7 @@
             background: rgba(0,0,0,0.3);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid #1f1f1f;
+            flex-shrink: 0;
         }
 
         .header h1 {
@@ -63,6 +64,7 @@
         .tabs-container {
             padding: 12px 16px;
             background: #000000;
+            flex-shrink: 0;
         }
 
         .tabs {
@@ -116,28 +118,28 @@
         .content {
             flex: 1;
             overflow-y: auto;
-            padding: 12px 16px;
+            padding: 8px 16px;
             -webkit-overflow-scrolling: touch;
         }
 
         .greeting {
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
 
         .greeting h2 {
-            font-size: 1.6rem;
+            font-size: 1.3rem;
             font-weight: 700;
         }
 
         .greeting p {
             color: #b3b3b3;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
         }
 
         .track-list, .playlist-list {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
 
         .track-item, .playlist-item {
@@ -159,25 +161,27 @@
         }
 
         .track-cover, .playlist-cover {
-            width: 52px;
-            height: 52px;
+            width: 48px;
+            height: 48px;
             border-radius: 8px;
             object-fit: cover;
-            margin-right: 14px;
+            margin-right: 12px;
             background: #282828;
+            flex-shrink: 0;
         }
 
         .playlist-cover-grid {
-            width: 52px;
-            height: 52px;
+            width: 48px;
+            height: 48px;
             display: grid;
             grid-template-columns: 1fr 1fr;
             grid-template-rows: 1fr 1fr;
             gap: 2px;
             border-radius: 8px;
             overflow: hidden;
-            margin-right: 14px;
+            margin-right: 12px;
             background: #282828;
+            flex-shrink: 0;
         }
 
         .playlist-cover-grid img {
@@ -188,34 +192,58 @@
 
         .track-info {
             flex: 1;
+            min-width: 0;
         }
 
         .track-name {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .track-artist {
-            font-size: 12px;
+            font-size: 11px;
             color: #b3b3b3;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .track-add {
-            color: #1db954;
-            font-size: 1.2rem;
+        .track-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .track-btn {
+            color: #b3b3b3;
+            font-size: 1.1rem;
             cursor: pointer;
-            padding: 8px;
+            padding: 6px;
+            transition: all 0.1s;
+        }
+
+        .track-btn:active {
+            transform: scale(0.9);
+            color: #1db954;
+        }
+
+        .track-btn-playlist {
+            color: #1db954;
         }
 
         .media-area {
             display: flex;
             justify-content: center;
-            margin: 20px 0;
+            margin: 10px 0;
         }
 
         .vinyl-player {
-            width: min(200px, 45vw);
-            height: min(200px, 45vw);
+            width: min(180px, 40vw);
+            height: min(180px, 40vw);
             border-radius: 50%;
             border: 4px solid #282828;
             overflow: hidden;
@@ -231,8 +259,11 @@
 
         #mobileVideo {
             width: 100%;
-            border-radius: 16px;
+            max-height: 200px;
+            border-radius: 12px;
             display: none;
+            object-fit: contain;
+            background: #000;
         }
 
         @keyframes spin {
@@ -269,62 +300,70 @@
         .player-bar {
             background: #000000;
             border-top: 1px solid #1f1f1f;
-            padding: 12px 16px;
+            padding: 10px 16px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
+            flex-shrink: 0;
         }
 
         .player-track {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         #playerCover {
-            width: 48px;
-            height: 48px;
+            width: 44px;
+            height: 44px;
             border-radius: 8px;
             object-fit: cover;
         }
 
         .player-track-info {
             flex: 1;
+            min-width: 0;
         }
 
         #playerTitle {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         #playerArtist {
-            font-size: 11px;
+            font-size: 10px;
             color: #b3b3b3;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .player-controls {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 28px;
-            margin: 4px 0;
+            gap: 24px;
+            margin: 2px 0;
         }
 
         .player-controls i {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             color: #b3b3b3;
             cursor: pointer;
         }
 
         .player-controls .play-btn {
-            font-size: 2.2rem;
+            font-size: 2rem;
             color: white;
         }
 
         .progress-container {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .progress-bar {
@@ -343,15 +382,15 @@
         }
 
         .time {
-            font-size: 10px;
+            font-size: 9px;
             color: #b3b3b3;
         }
 
         .volume-row {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-top: 4px;
+            gap: 8px;
+            margin-top: 2px;
         }
 
         .vol-bar {
@@ -424,12 +463,17 @@
 
         .empty-state {
             text-align: center;
-            padding: 40px;
+            padding: 30px 20px;
             color: #555;
         }
 
+        .empty-state i {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
         .playlist-badge {
-            font-size: 11px;
+            font-size: 10px;
             color: #1db954;
             margin-top: 2px;
             display: block;
@@ -496,55 +540,52 @@
             display: none;
         }
 
-        .context-menu-mobile {
-            position: fixed;
-            background: #282828;
-            border-radius: 16px;
-            padding: 8px;
-            box-shadow: 0 16px 32px rgba(0,0,0,0.6);
-            display: none;
-            z-index: 2000;
-            min-width: 200px;
-            backdrop-filter: blur(20px);
-        }
-
-        .context-item-mobile {
-            padding: 12px 16px;
-            cursor: pointer;
-            font-size: 14px;
-            color: #e0e0e0;
-            border-radius: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .context-item-mobile:active {
-            background: #3e3e3e;
-        }
-
-        .context-submenu-mobile {
-            position: absolute;
-            left: 100%;
-            top: 0;
-            background: #282828;
-            display: none;
-            border-radius: 12px;
-            padding: 8px;
-            border: 1px solid #3e3e3e;
-            min-width: 180px;
-        }
-
         .folder-info {
             background: #1a1a1a;
-            padding: 8px 12px;
-            margin: 8px 0;
-            border-radius: 12px;
-            font-size: 11px;
+            padding: 6px 12px;
+            margin: 6px 0;
+            border-radius: 10px;
+            font-size: 10px;
             color: #1db954;
             display: flex;
             justify-content: space-between;
             align-items: center;
+        }
+
+        .playlist-selector {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #1a1a1a;
+            border-radius: 20px 20px 0 0;
+            padding: 16px;
+            z-index: 250;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            max-height: 60%;
+            overflow-y: auto;
+        }
+
+        .playlist-selector.open {
+            transform: translateY(0);
+        }
+
+        .playlist-selector h4 {
+            margin-bottom: 12px;
+            color: #1db954;
+        }
+
+        .playlist-option {
+            padding: 12px;
+            background: #282828;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+
+        .playlist-option:active {
+            background: #3e3e3e;
         }
     </style>
 </head>
@@ -574,7 +615,7 @@
                 <h2>Buenas</h2>
                 <p>🎧 Tu música, donde quieras</p>
             </div>
-            <div id="plIndicator" style="background:#1db95420; padding:8px; border-radius:12px; margin-bottom:12px; text-align:center; font-size:12px; display:none;"></div>
+            <div id="plIndicator" style="background:#1db95420; padding:6px; border-radius:10px; margin-bottom:8px; text-align:center; font-size:11px; display:none;"></div>
             <div id="folderInfo" class="folder-info" style="display:none;">
                 <span><i class="fa-solid fa-folder-open"></i> <span id="folderName"></span></span>
                 <span><i class="fa-solid fa-music"></i> <span id="trackCount">0</span> canciones</span>
@@ -583,15 +624,14 @@
                 <div class="vinyl-player" id="vinylPlayer">
                     <img id="vinylImg" src="">
                 </div>
-                <video id="mobileVideo" loop playsinline></video>
+                <video id="mobileVideo" loop playsinline webkit-playsinline playsinline></video>
             </div>
             <div id="trackListContainer" class="track-list"></div>
             <div id="playlistListContainer" class="playlist-list" style="display:none;"></div>
             <div id="emptyState" class="empty-state">
-                <i class="fa-solid fa-folder-tree" style="font-size:3rem; margin-bottom:12px;"></i>
+                <i class="fa-solid fa-folder-tree"></i>
                 <p>Toca el botón verde + para seleccionar una CARPETA</p>
-                <p style="font-size:12px; margin-top:8px;">Selecciona una carpeta con música MP3/MP4</p>
-                <p style="font-size:11px; color:#1db954; margin-top:12px;">La carpeta "portadas" se detectará automáticamente</p>
+                <p style="font-size:11px; margin-top:6px;">Selecciona una carpeta con música MP3/MP4</p>
             </div>
         </div>
 
@@ -619,7 +659,7 @@
                 <span class="time" id="totalTime">0:00</span>
             </div>
             <div class="volume-row">
-                <i class="fa-solid fa-volume-up" style="font-size:0.9rem; color:#b3b3b3;"></i>
+                <i class="fa-solid fa-volume-up" style="font-size:0.8rem; color:#b3b3b3;"></i>
                 <div class="vol-bar" id="volBar">
                     <div class="vol-fill" id="volFill" style="width:70%"></div>
                 </div>
@@ -643,11 +683,19 @@
         <div class="drawer-content" id="queueDrawerContent"></div>
     </div>
 
+    <!-- Selector de playlist flotante -->
+    <div id="playlistSelector" class="playlist-selector">
+        <h4><i class="fa-solid fa-list"></i> Seleccionar playlist</h4>
+        <div id="playlistSelectorList"></div>
+        <div style="margin-top: 12px; text-align: center;">
+            <button class="btn-green" id="closePlaylistSelector" style="padding: 8px 20px;">Cancelar</button>
+        </div>
+    </div>
+
     <div class="fab" id="fabBtn">
         <i class="fa-solid fa-plus"></i>
     </div>
 
-    <!-- Input para seleccionar CARPETA completa -->
     <input type="file" id="folderInput" class="hidden-input" webkitdirectory directory multiple>
 
     <div id="customModal" class="modal-overlay">
@@ -661,8 +709,6 @@
         </div>
     </div>
 
-    <div id="contextMenuMobile" class="context-menu-mobile"></div>
-
     <audio id="audioPlayer"></audio>
 
     <script>
@@ -674,12 +720,10 @@
         let playQueue = [];
         let playlists = [];
         let currentTab = 'lib';
-        let contextTrackIndex = -1;
-        let contextPlaylistIndex = -1;
-        let contextQueueIndex = -1;
         let activePlaylistIdx = -1;
-        let currentFolderHandle = null;
         let currentFolderName = "";
+        let currentFolderHandle = null;
+        let pendingTrackForPlaylist = null;
 
         const audio = document.getElementById('audioPlayer');
         const videoEl = document.getElementById('mobileVideo');
@@ -689,20 +733,19 @@
         function fmt(sec) { const m = Math.floor(sec/60), s = Math.floor(sec%60); return `${m}:${s<10?'0':''}${s}`; }
         function getCoverURL(name) { return coverCache.get(name.toLowerCase().trim()) || 'https://via.placeholder.com/150?text=♫'; }
 
-        // ==================== CONFIGURACIÓN JSON (como en PC) ====================
+        // ==================== CONFIGURACIÓN JSON ====================
         async function saveConfig() {
-            if (!currentFolderHandle) return;
-            
+            if (!currentFolderHandle) {
+                localStorage.setItem('spotify_mobile_backup', JSON.stringify({
+                    playlists, playQueue, isShuffle, isRepeat, activePlaylistIdx
+                }));
+                return;
+            }
             try {
-                // Intentar obtener o crear la carpeta 'config'
                 let configDir;
                 try {
                     configDir = await currentFolderHandle.getDirectoryHandle('config', { create: true });
-                } catch(e) {
-                    console.log("No se pudo crear carpeta config", e);
-                    return;
-                }
-                
+                } catch(e) { return; }
                 const configData = {
                     lastTrack: currentIndex !== -1 ? allTracks[currentIndex]?.name : null,
                     currentTime: active.currentTime,
@@ -712,15 +755,11 @@
                     isRepeat: isRepeat,
                     activePlaylistIdx: activePlaylistIdx
                 };
-                
                 const fileHandle = await configDir.getFileHandle('config.json', { create: true });
                 const writable = await fileHandle.createWritable();
                 await writable.write(JSON.stringify(configData, null, 2));
                 await writable.close();
-                console.log("Configuración guardada en config/config.json");
             } catch(e) {
-                console.error("Error guardando config:", e);
-                // Fallback a localStorage
                 localStorage.setItem('spotify_mobile_backup', JSON.stringify({
                     playlists, playQueue, isShuffle, isRepeat, activePlaylistIdx
                 }));
@@ -728,25 +767,36 @@
         }
 
         async function loadConfig() {
-            if (!currentFolderHandle) return;
-            
+            if (!currentFolderHandle) {
+                const backup = localStorage.getItem('spotify_mobile_backup');
+                if(backup) {
+                    const data = JSON.parse(backup);
+                    playlists = data.playlists || [];
+                    playQueue = data.queue || [];
+                    isShuffle = data.isShuffle || false;
+                    isRepeat = data.isRepeat || false;
+                    activePlaylistIdx = data.activePlaylistIdx !== undefined ? data.activePlaylistIdx : -1;
+                }
+                updateShuffleRepeatUI();
+                updateStatusLabel();
+                renderQueueDrawer();
+                renderLibrary();
+                return;
+            }
             try {
                 const configDir = await currentFolderHandle.getDirectoryHandle('config');
                 const fileHandle = await configDir.getFileHandle('config.json');
                 const file = await fileHandle.getFile();
                 const data = JSON.parse(await file.text());
-                
                 playlists = data.playlists || [];
                 playQueue = data.queue || [];
                 isShuffle = data.isShuffle || false;
                 isRepeat = data.isRepeat || false;
                 activePlaylistIdx = data.activePlaylistIdx !== undefined ? data.activePlaylistIdx : -1;
-                
                 updateShuffleRepeatUI();
                 updateStatusLabel();
                 renderQueueDrawer();
                 renderLibrary();
-                
                 if (data.lastTrack && allTracks.length > 0) {
                     const idx = allTracks.findIndex(t => t.name === data.lastTrack);
                     if (idx !== -1) {
@@ -759,25 +809,7 @@
                         }
                     }
                 }
-                console.log("Configuración cargada desde config/config.json");
-                return;
-            } catch(e) {
-                console.log("No se encontró config.json, usando valores por defecto o backup");
-                // Fallback a localStorage
-                const backup = localStorage.getItem('spotify_mobile_backup');
-                if(backup) {
-                    const data = JSON.parse(backup);
-                    playlists = data.playlists || [];
-                    playQueue = data.queue || [];
-                    isShuffle = data.isShuffle || false;
-                    isRepeat = data.isRepeat || false;
-                    activePlaylistIdx = data.activePlaylistIdx !== undefined ? data.activePlaylistIdx : -1;
-                    updateShuffleRepeatUI();
-                    updateStatusLabel();
-                    renderQueueDrawer();
-                    renderLibrary();
-                }
-            }
+            } catch(e) {}
         }
 
         function updateShuffleRepeatUI() {
@@ -807,46 +839,31 @@
         async function selectFolder() {
             const input = document.getElementById('folderInput');
             input.value = '';
-            
             input.onchange = async (e) => {
                 const files = Array.from(e.target.files);
                 if(files.length === 0) return;
-                
-                // Obtener el nombre de la carpeta
                 const firstFile = files[0];
                 const pathParts = firstFile.webkitRelativePath.split('/');
                 currentFolderName = pathParts[0];
-                
-                // Crear un FileSystemDirectoryHandle simulado para guardar config
-                // En móvil no podemos obtener el handle real, pero podemos simularlo
                 currentFolderHandle = { name: currentFolderName };
-                
-                // Limpiar datos
                 allTracks = [];
                 coverCache.clear();
-                
                 const audioFiles = [];
                 const coverFiles = new Map();
-                
                 for (const file of files) {
                     const relativePath = file.webkitRelativePath;
                     const pathParts2 = relativePath.split('/');
                     const fileName = pathParts2[pathParts2.length - 1];
                     const subFolder = pathParts2.length > 2 ? pathParts2[1] : "";
-                    
                     const ext = fileName.toLowerCase();
-                    
-                    if (ext.endsWith('.mp3') || ext.endsWith('.mp4')) {
+                    if (ext.endsWith('.mp3') || ext.endsWith('.mp4') || ext.endsWith('.m4a')) {
                         audioFiles.push(file);
                     }
-                    
-                    // Detectar carpeta "portadas"
                     if (subFolder.toLowerCase() === 'portadas') {
                         const nameWithoutExt = fileName.replace(/\.[^/.]+$/, "").toLowerCase().trim();
                         coverFiles.set(nameWithoutExt, file);
                     }
                 }
-                
                 for (const file of audioFiles) {
                     allTracks.push({
                         name: file.name,
@@ -854,26 +871,19 @@
                         getFile: async () => file
                     });
                 }
-                
                 for (const [name, file] of coverFiles) {
                     const url = URL.createObjectURL(file);
                     coverCache.set(name, url);
                 }
-                
                 filteredTracks = [...allTracks];
-                
-                // Actualizar UI
                 renderLibrary();
                 document.getElementById('emptyState').style.display = 'none';
                 const folderInfo = document.getElementById('folderInfo');
                 folderInfo.style.display = 'flex';
                 document.getElementById('folderName').innerText = currentFolderName;
                 document.getElementById('trackCount').innerText = allTracks.length;
-                
-                // Cargar configuración guardada
                 await loadConfig();
             };
-            
             input.click();
         }
 
@@ -899,32 +909,22 @@
                     const [t, a] = cleanName.split(' - ');
                     const div = document.createElement('div');
                     div.className = `track-item ${originalIdx === currentIndex ? 'active' : ''}`;
-                    div.setAttribute('data-index', originalIdx);
                     div.innerHTML = `
                         <img class="track-cover" src="${getCoverURL(cleanName)}">
                         <div class="track-info">
                             <div class="track-name">${t || cleanName}</div>
                             <div class="track-artist">${a || 'Desconocido'}</div>
                         </div>
-                        <i class="fa-solid fa-plus track-add" data-idx="${originalIdx}"></i>
+                        <div class="track-actions">
+                            <i class="fa-regular fa-square-plus track-btn" data-action="queue" data-idx="${originalIdx}"></i>
+                            <i class="fa-solid fa-list track-btn track-btn-playlist" data-action="playlist" data-idx="${originalIdx}"></i>
+                        </div>
                     `;
-                    div.querySelector('.track-add').onclick = (e) => { e.stopPropagation(); addToQueue(originalIdx); };
-                    div.onclick = (e) => { 
-                        if(e.target.tagName !== 'I') { 
-                            activePlaylistIdx = -1; 
-                            updateStatusLabel(); 
-                            playIndex(originalIdx); 
-                        } 
-                    };
-                    div.ontouchstart = (e) => {
-                        let timer;
-                        div.ontouchmove = () => clearTimeout(timer);
-                        div.ontouchend = () => clearTimeout(timer);
-                        timer = setTimeout(() => {
-                            contextTrackIndex = originalIdx;
-                            showContextMenu(e, 'track');
-                        }, 500);
-                    };
+                    const queueBtn = div.querySelector('[data-action="queue"]');
+                    const playlistBtn = div.querySelector('[data-action="playlist"]');
+                    queueBtn.onclick = (e) => { e.stopPropagation(); addToQueue(originalIdx); };
+                    playlistBtn.onclick = (e) => { e.stopPropagation(); showPlaylistSelector(originalIdx); };
+                    div.onclick = () => { activePlaylistIdx = -1; updateStatusLabel(); playIndex(originalIdx); };
                     trackContainer.appendChild(div);
                 });
             } else {
@@ -934,7 +934,6 @@
                 playlists.forEach((p, i) => {
                     const div = document.createElement('div');
                     div.className = `playlist-item ${activePlaylistIdx === i ? 'active' : ''}`;
-                    div.setAttribute('data-index', i);
                     let coverHtml = '';
                     if(p.image) coverHtml = `<img class="playlist-cover" src="${p.image}">`;
                     else {
@@ -944,93 +943,50 @@
                     }
                     div.innerHTML = `${coverHtml}<div class="track-info"><div class="track-name">${p.name}</div><div class="track-artist">${p.songs.length} canciones</div></div>`;
                     div.onclick = () => { activePlaylistIdx = i; playPlaylist(i); };
-                    div.ontouchstart = (e) => {
-                        let timer;
-                        div.ontouchmove = () => clearTimeout(timer);
-                        div.ontouchend = () => clearTimeout(timer);
-                        timer = setTimeout(() => {
-                            contextPlaylistIndex = i;
-                            showContextMenu(e, 'playlist');
-                        }, 500);
-                    };
                     playlistContainer.appendChild(div);
                 });
             }
         }
 
-        // ==================== MENÚ CONTEXTUAL ====================
-        function showContextMenu(e, type) {
-            e.preventDefault();
-            const menu = document.getElementById('contextMenuMobile');
-            let x = e.touches ? e.touches[0].clientX : e.clientX;
-            let y = e.touches ? e.touches[0].clientY : e.clientY;
+        // ==================== SELECTOR DE PLAYLIST ====================
+        function showPlaylistSelector(trackIdx) {
+            pendingTrackForPlaylist = trackIdx;
+            const selector = document.getElementById('playlistSelector');
+            const listContainer = document.getElementById('playlistSelectorList');
+            listContainer.innerHTML = '';
             
-            menu.innerHTML = '';
-            
-            if(type === 'track') {
-                menu.innerHTML = `
-                    <div class="context-item-mobile" onclick="addToQueueFromMenu(); closeContextMenu();">
-                        <span>Añadir a la cola</span><i class="fa-solid fa-list-ol"></i>
-                    </div>
-                    <div class="context-item-mobile" id="playlistSubmenuMobile">
-                        <span>Añadir a playlist</span><i class="fa-solid fa-chevron-right"></i>
-                        <div class="context-submenu-mobile" id="playlistSubmenuContent">
-                            <div class="context-item-mobile" onclick="createPlaylistWithTrack(); closeContextMenu();"><b>+ Nueva Playlist</b></div>
-                            ${playlists.map((p, i) => `<div class="context-item-mobile" onclick="addTrackToPlaylist(${i}); closeContextMenu();">${p.name}</div>`).join('')}
-                        </div>
-                    </div>
-                `;
-                const submenuTrigger = document.getElementById('playlistSubmenuMobile');
-                const submenuContent = document.getElementById('playlistSubmenuContent');
-                if(submenuTrigger && submenuContent) {
-                    submenuTrigger.onclick = (e) => {
-                        e.stopPropagation();
-                        submenuContent.style.display = submenuContent.style.display === 'block' ? 'none' : 'block';
+            if (playlists.length === 0) {
+                listContainer.innerHTML = '<div style="padding:12px; text-align:center; color:#888;">No hay playlists. Crea una primero.</div>';
+            } else {
+                playlists.forEach((p, i) => {
+                    const option = document.createElement('div');
+                    option.className = 'playlist-option';
+                    option.innerHTML = `<i class="fa-solid fa-list"></i> ${p.name}`;
+                    option.onclick = () => {
+                        addToPlaylist(pendingTrackForPlaylist, i);
+                        selector.classList.remove('open');
+                        pendingTrackForPlaylist = null;
                     };
-                }
-            } else if(type === 'playlist') {
-                menu.innerHTML = `
-                    <div class="context-item-mobile" onclick="playPlaylistRandom(${contextPlaylistIndex}); closeContextMenu();">
-                        <span>Reproducir aleatorio</span><i class="fa-solid fa-shuffle"></i>
-                    </div>
-                    <div class="context-item-mobile" onclick="renamePlaylist(${contextPlaylistIndex}); closeContextMenu();">
-                        <span>Cambiar nombre</span><i class="fa-solid fa-pen"></i>
-                    </div>
-                    <div class="context-item-mobile" onclick="changePlaylistPhoto(${contextPlaylistIndex}); closeContextMenu();">
-                        <span>Cambiar foto</span><i class="fa-solid fa-image"></i>
-                    </div>
-                    <div class="context-item-mobile" style="color: #ff4444;" onclick="deletePlaylist(${contextPlaylistIndex}); closeContextMenu();">
-                        <span>Eliminar</span><i class="fa-solid fa-trash"></i>
-                    </div>
-                `;
-            } else if(type === 'queue') {
-                menu.innerHTML = `
-                    <div class="context-item-mobile" onclick="playNowFromQueue(${contextQueueIndex}); closeContextMenu();">
-                        <span>Reproducir ya</span><i class="fa-solid fa-play"></i>
-                    </div>
-                    <div class="context-item-mobile" style="color: #ff4444;" onclick="removeFromQueue(${contextQueueIndex}); closeContextMenu();">
-                        <span>Eliminar de la cola</span><i class="fa-solid fa-xmark"></i>
-                    </div>
-                `;
+                    listContainer.appendChild(option);
+                });
             }
-            
-            menu.style.display = 'block';
-            if(x + 200 > window.innerWidth) x -= 200;
-            if(y + (menu.offsetHeight || 200) > window.innerHeight) y -= (menu.offsetHeight || 200);
-            menu.style.left = x + 'px';
-            menu.style.top = y + 'px';
-            
-            setTimeout(() => {
-                document.addEventListener('click', closeContextMenu);
-                document.addEventListener('touchstart', closeContextMenu);
-            }, 10);
+            selector.classList.add('open');
         }
 
-        function closeContextMenu() {
-            const menu = document.getElementById('contextMenuMobile');
-            if(menu) menu.style.display = 'none';
-            document.removeEventListener('click', closeContextMenu);
-            document.removeEventListener('touchstart', closeContextMenu);
+        function closePlaylistSelector() {
+            document.getElementById('playlistSelector').classList.remove('open');
+            pendingTrackForPlaylist = null;
+        }
+
+        async function addToPlaylist(trackIdx, playlistIdx) {
+            if (trackIdx !== null && allTracks[trackIdx] && playlists[playlistIdx]) {
+                const trackName = allTracks[trackIdx].name;
+                if (!playlists[playlistIdx].songs.includes(trackName)) {
+                    playlists[playlistIdx].songs.push(trackName);
+                    renderLibrary();
+                    await saveConfig();
+                }
+            }
         }
 
         // ==================== FUNCIONES PLAYLIST ====================
@@ -1080,27 +1036,6 @@
             input.click();
         }
 
-        async function addTrackToPlaylist(pIdx) {
-            if(contextTrackIndex !== -1 && allTracks[contextTrackIndex]) {
-                const trackName = allTracks[contextTrackIndex].name;
-                if(!playlists[pIdx].songs.includes(trackName)) {
-                    playlists[pIdx].songs.push(trackName);
-                    renderLibrary();
-                    await saveConfig();
-                }
-            }
-        }
-
-        function createPlaylistWithTrack() {
-            openModal("Nombre de la playlist", async (name) => {
-                if(name && contextTrackIndex !== -1) {
-                    playlists.push({ name, songs: [allTracks[contextTrackIndex].name], image: null });
-                    renderLibrary();
-                    await saveConfig();
-                }
-            });
-        }
-
         function playPlaylistRandom(idx) {
             isShuffle = true;
             updateShuffleRepeatUI();
@@ -1115,14 +1050,6 @@
             saveConfig(); 
         }
         
-        function addToQueueFromMenu() { 
-            if(contextTrackIndex !== -1) { 
-                playQueue.push(contextTrackIndex); 
-                renderQueueDrawer(); 
-                saveConfig(); 
-            } 
-        }
-        
         function playNowFromQueue(qIdx) {
             const trackIdx = playQueue[qIdx];
             playQueue.splice(qIdx, 1);
@@ -1131,10 +1058,10 @@
             saveConfig();
         }
         
-        function removeFromQueue(qIdx) {
+        async function removeFromQueue(qIdx) {
             playQueue.splice(qIdx, 1);
             renderQueueDrawer();
-            saveConfig();
+            await saveConfig();
         }
 
         function renderQueueDrawer() {
@@ -1148,21 +1075,18 @@
                 const [t, a] = cleanName.split(' - ');
                 const div = document.createElement('div');
                 div.className = 'drawer-item';
-                div.setAttribute('data-qindex', qIndex);
-                div.innerHTML = `<img class="track-cover" src="${getCoverURL(cleanName)}"><div class="track-info"><div class="track-name">${t || cleanName}</div><div class="track-artist">${a || 'Desconocido'}</div></div>`;
-                div.onclick = () => playNowFromQueue(qIndex);
-                div.ontouchstart = (e) => {
-                    let timer;
-                    div.ontouchmove = () => clearTimeout(timer);
-                    div.ontouchend = () => clearTimeout(timer);
-                    timer = setTimeout(() => {
-                        contextQueueIndex = qIndex;
-                        showContextMenu(e, 'queue');
-                    }, 500);
-                };
+                div.innerHTML = `
+                    <img class="track-cover" src="${getCoverURL(cleanName)}">
+                    <div class="track-info">
+                        <div class="track-name">${t || cleanName}</div>
+                        <div class="track-artist">${a || 'Desconocido'}</div>
+                    </div>
+                    <i class="fa-solid fa-trash" style="color:#ff4444; padding:8px;" onclick="removeFromQueue(${qIndex})"></i>
+                `;
+                div.onclick = (e) => { if(e.target.tagName !== 'I') playNowFromQueue(qIndex); };
                 container.appendChild(div);
             });
-            if(playQueue.length === 0) container.innerHTML = '<div class="empty-state" style="padding:20px;">Cola vacía</div>';
+            if(playQueue.length === 0) container.innerHTML = '<div class="empty-state">Cola vacía</div>';
         }
 
         function renderDrawerLibrary() {
@@ -1214,14 +1138,21 @@
             playerCover.style.display = 'block';
             document.getElementById('vinylImg').src = imgURL;
             
-            audio.pause(); videoEl.pause();
+            audio.pause();
+            videoEl.pause();
+            videoEl.style.display = 'none';
+            document.getElementById('vinylPlayer').style.display = 'none';
+            
             if(currentMediaURL) URL.revokeObjectURL(currentMediaURL);
             currentMediaURL = URL.createObjectURL(file);
             
-            if(file.name.toLowerCase().endsWith('.mp4')) {
+            const isVideo = file.name.toLowerCase().endsWith('.mp4') || file.name.toLowerCase().endsWith('.m4a');
+            
+            if(isVideo) {
                 videoEl.src = currentMediaURL;
                 videoEl.style.display = 'block';
-                document.getElementById('vinylPlayer').style.display = 'none';
+                videoEl.controls = true;
+                videoEl.setAttribute('controls', '');
                 videoEl.play();
                 active = videoEl;
             } else {
@@ -1229,8 +1160,8 @@
                 audio.play();
                 active = audio;
                 document.getElementById('vinylPlayer').style.display = 'block';
-                videoEl.style.display = 'none';
             }
+            
             document.getElementById('playPauseBtn').className = "fa-solid fa-circle-pause play-btn";
             document.getElementById('vinylPlayer').style.animationPlayState = 'running';
             renderLibrary();
@@ -1353,6 +1284,7 @@
             document.getElementById('queueBtn').onclick = () => { renderQueueDrawer(); document.getElementById('queueDrawer').classList.add('open'); };
             document.getElementById('closeDrawer').onclick = () => document.getElementById('libraryDrawer').classList.remove('open');
             document.getElementById('closeQueueDrawer').onclick = () => document.getElementById('queueDrawer').classList.remove('open');
+            document.getElementById('closePlaylistSelector').onclick = () => closePlaylistSelector();
             document.getElementById('prevBtn').onclick = () => prevTrack();
             document.getElementById('nextBtn').onclick = () => nextTrack();
             document.getElementById('playPauseBtn').onclick = () => togglePlay();
@@ -1382,17 +1314,14 @@
         
         // Exponer funciones globales
         window.addToQueue = addToQueue;
-        window.addToQueueFromMenu = addToQueueFromMenu;
         window.playNowFromQueue = playNowFromQueue;
         window.removeFromQueue = removeFromQueue;
         window.createPlaylist = createPlaylist;
         window.renamePlaylist = renamePlaylist;
         window.deletePlaylist = deletePlaylist;
         window.changePlaylistPhoto = changePlaylistPhoto;
-        window.addTrackToPlaylist = addTrackToPlaylist;
-        window.createPlaylistWithTrack = createPlaylistWithTrack;
         window.playPlaylistRandom = playPlaylistRandom;
-        window.closeContextMenu = closeContextMenu;
+        window.addToPlaylist = addToPlaylist;
         
         init();
     </script>
