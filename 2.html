@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Spotify Ultra Pro - Mobile Edition</title>
+    <title>MÚSICA PRO - Mobile Edition</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -27,44 +27,71 @@
             display: flex;
             flex-direction: column;
             height: 100%;
-            background: linear-gradient(180deg, #1a1a1a 0%, #000000 100%);
+            background: linear-gradient(180deg, #0a0a0a 0%, #000000 100%);
         }
 
         /* HEADER */
         .header {
-            padding: 12px 20px;
+            padding: 14px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             background: rgba(0,0,0,0.3);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid #1f1f1f;
+            backdrop-filter: blur(20px);
+            border-bottom: 0.5px solid rgba(255,255,255,0.08);
             flex-shrink: 0;
         }
 
-        .header h1 {
-            font-size: 1.5rem;
+        .logo-section {
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+        }
+
+        .logo-icon {
+            font-size: 1.4rem;
+            color: #1db954;
+        }
+
+        .logo-text {
+            font-size: 1.3rem;
             font-weight: 700;
-            background: linear-gradient(135deg, #1db954, #1ed760);
+            background: linear-gradient(135deg, #ffffff, #1db954);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-badge {
+            font-size: 0.6rem;
+            background: rgba(29,185,84,0.2);
+            padding: 2px 6px;
+            border-radius: 20px;
+            color: #1db954;
+            margin-left: 6px;
         }
 
         .header-icons {
             display: flex;
-            gap: 20px;
+            gap: 18px;
         }
 
         .header-icons i {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             color: #b3b3b3;
             cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .header-icons i:active {
+            color: #1db954;
+            transform: scale(0.95);
         }
 
         /* TABS */
         .tabs-container {
-            padding: 12px 20px;
+            padding: 12px 20px 8px 20px;
             background: #000000;
             flex-shrink: 0;
         }
@@ -72,17 +99,17 @@
         .tabs {
             display: flex;
             gap: 10px;
-            background: #1f1f1f;
-            border-radius: 40px;
-            padding: 5px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 50px;
+            padding: 4px;
         }
 
         .tab {
             flex: 1;
             text-align: center;
-            padding: 10px;
-            border-radius: 40px;
-            font-size: 14px;
+            padding: 9px;
+            border-radius: 50px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
@@ -92,22 +119,24 @@
         .tab.active {
             background: #1db954;
             color: #000000;
+            box-shadow: 0 2px 8px rgba(29,185,84,0.3);
         }
 
         /* SEARCH */
         .search-bar {
-            margin-top: 12px;
-            background: #1f1f1f;
+            margin-top: 10px;
+            background: rgba(255,255,255,0.06);
             border-radius: 30px;
-            padding: 10px 16px;
+            padding: 8px 14px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+            border: 0.5px solid rgba(255,255,255,0.05);
         }
 
         .search-bar i {
             color: #b3b3b3;
-            font-size: 1rem;
+            font-size: 0.85rem;
         }
 
         .search-bar input {
@@ -115,7 +144,7 @@
             border: none;
             color: white;
             flex: 1;
-            font-size: 14px;
+            font-size: 13px;
             outline: none;
         }
 
@@ -123,54 +152,56 @@
         .content {
             flex: 1;
             overflow-y: auto;
-            padding: 10px 20px;
+            padding: 8px 20px;
             -webkit-overflow-scrolling: touch;
         }
 
         .greeting {
-            margin-bottom: 15px;
+            margin-bottom: 14px;
         }
 
         .greeting h2 {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             font-weight: 700;
+            letter-spacing: -0.3px;
         }
 
         .greeting p {
             color: #b3b3b3;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
         }
 
         /* LISTS */
         .track-list, .playlist-list {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
 
         .track-item, .playlist-item {
             display: flex;
             align-items: center;
-            padding: 10px;
-            background: rgba(255,255,255,0.05);
+            padding: 8px;
+            background: rgba(255,255,255,0.03);
             border-radius: 12px;
             cursor: pointer;
-            transition: background 0.1s;
+            transition: all 0.15s;
         }
 
         .track-item:active, .playlist-item:active {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.07);
+            transform: scale(0.99);
         }
 
         .track-item.active {
-            background: rgba(29,185,84,0.15);
+            background: rgba(29,185,84,0.12);
             border-left: 3px solid #1db954;
         }
 
         .track-cover, .playlist-cover {
-            width: 50px;
-            height: 50px;
-            border-radius: 8px;
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
             object-fit: cover;
             margin-right: 12px;
             background: #282828;
@@ -178,13 +209,13 @@
         }
 
         .playlist-cover-grid {
-            width: 50px;
-            height: 50px;
+            width: 48px;
+            height: 48px;
             display: grid;
             grid-template-columns: 1fr 1fr;
             grid-template-rows: 1fr 1fr;
             gap: 2px;
-            border-radius: 8px;
+            border-radius: 10px;
             overflow: hidden;
             margin-right: 12px;
             background: #282828;
@@ -203,7 +234,7 @@
         }
 
         .track-name {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             white-space: nowrap;
             overflow: hidden;
@@ -211,7 +242,7 @@
         }
 
         .track-artist {
-            font-size: 11px;
+            font-size: 10px;
             color: #b3b3b3;
             white-space: nowrap;
             overflow: hidden;
@@ -220,16 +251,16 @@
 
         .track-actions {
             display: flex;
-            gap: 12px;
+            gap: 8px;
             align-items: center;
             flex-shrink: 0;
         }
 
         .track-btn {
             color: #b3b3b3;
-            font-size: 1.1rem;
+            font-size: 0.95rem;
             cursor: pointer;
-            padding: 6px;
+            padding: 5px;
             transition: all 0.1s;
         }
 
@@ -242,56 +273,32 @@
             color: #1db954;
         }
 
-        /* FAB BUTTON */
-        .fab {
-            position: fixed;
-            bottom: 110px;
-            right: 20px;
-            background: #1db954;
-            width: 56px;
-            height: 56px;
-            border-radius: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-            cursor: pointer;
-            z-index: 100;
-            transition: transform 0.1s;
-        }
-
-        .fab:active {
-            transform: scale(0.95);
-        }
-
-        .fab i {
-            font-size: 1.8rem;
-            color: #000000;
-        }
-
-        /* PLAYER BAR - CON MÁS ESPACIO */
+        /* PLAYER BAR */
         .player-bar {
-            background: #000000;
-            border-top: 1px solid #1f1f1f;
-            padding: 14px 20px 18px 20px;
+            background: rgba(8,8,8,0.95);
+            backdrop-filter: blur(20px);
+            border-top: 0.5px solid rgba(255,255,255,0.08);
+            padding: 10px 20px 18px 20px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             flex-shrink: 0;
         }
 
         .player-track {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
+            position: relative;
         }
 
         #playerCover {
-            width: 52px;
-            height: 52px;
-            border-radius: 8px;
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
             object-fit: cover;
             cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
 
         .player-track-info {
@@ -300,7 +307,7 @@
         }
 
         #playerTitle {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             white-space: nowrap;
             overflow: hidden;
@@ -308,43 +315,74 @@
         }
 
         #playerArtist {
-            font-size: 11px;
+            font-size: 10px;
             color: #b3b3b3;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
+        /* BOTÓN + DENTRO DEL PLAYER (A LA DERECHA) */
+        .player-add-btn {
+            background: #1db954;
+            width: 36px;
+            height: 36px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 6px rgba(29,185,84,0.3);
+            flex-shrink: 0;
+        }
+
+        .player-add-btn:active {
+            transform: scale(0.92);
+            background: #1aa34a;
+        }
+
+        .player-add-btn i {
+            font-size: 1rem;
+            color: #000000;
+        }
+
         .player-controls {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 32px;
-            margin: 6px 0;
+            gap: 28px;
+            margin: 4px 0;
         }
 
         .player-controls i {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             color: #b3b3b3;
             cursor: pointer;
+            transition: all 0.1s;
+        }
+
+        .player-controls i:active {
+            transform: scale(0.92);
+            color: #1db954;
         }
 
         .player-controls .play-btn {
-            font-size: 2.4rem;
+            font-size: 2.2rem;
             color: white;
         }
 
         .progress-container {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
         }
 
         .progress-bar {
             flex: 1;
-            height: 5px;
-            background: #3e3e3e;
-            border-radius: 3px;
+            height: 4px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 2px;
             cursor: pointer;
             position: relative;
         }
@@ -353,17 +391,17 @@
             width: 0%;
             height: 100%;
             background: #1db954;
-            border-radius: 3px;
+            border-radius: 2px;
             position: relative;
         }
 
         .progress-fill::after {
             content: '';
             position: absolute;
-            right: -7px;
-            top: -5px;
-            width: 15px;
-            height: 15px;
+            right: -6px;
+            top: -4px;
+            width: 12px;
+            height: 12px;
             background: #1db954;
             border-radius: 50%;
             opacity: 0;
@@ -375,22 +413,22 @@
         }
 
         .time {
-            font-size: 11px;
+            font-size: 10px;
             color: #b3b3b3;
-            min-width: 38px;
+            min-width: 35px;
         }
 
         .volume-row {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-top: 6px;
+            gap: 8px;
+            margin-top: 4px;
         }
 
         .vol-bar {
             flex: 1;
-            height: 4px;
-            background: #3e3e3e;
+            height: 3px;
+            background: rgba(255,255,255,0.15);
             border-radius: 2px;
             cursor: pointer;
         }
@@ -409,18 +447,22 @@
             bottom: 0;
             width: 85%;
             max-width: 320px;
-            background: #0a0a0a;
+            background: rgba(10,10,10,0.98);
+            backdrop-filter: blur(20px);
             z-index: 200;
             transform: translateX(-100%);
-            transition: transform 0.25s ease;
+            transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
             display: flex;
             flex-direction: column;
+            border-right: 0.5px solid rgba(255,255,255,0.08);
         }
 
         .drawer-right {
             right: 0;
             left: auto;
             transform: translateX(100%);
+            border-right: none;
+            border-left: 0.5px solid rgba(255,255,255,0.08);
         }
 
         .drawer.open {
@@ -428,13 +470,23 @@
         }
 
         .drawer-header {
-            padding: 20px 16px;
-            border-bottom: 1px solid #1f1f1f;
+            padding: 22px 20px;
+            border-bottom: 0.5px solid rgba(255,255,255,0.08);
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-weight: 700;
             font-size: 1.1rem;
+        }
+
+        .drawer-header i {
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #b3b3b3;
+        }
+
+        .drawer-header i:active {
+            color: #1db954;
         }
 
         .drawer-content {
@@ -446,29 +498,31 @@
         .drawer-item {
             display: flex;
             align-items: center;
-            padding: 12px;
+            padding: 10px;
             border-radius: 12px;
             cursor: pointer;
             margin-bottom: 6px;
+            transition: background 0.1s;
         }
 
         .drawer-item:active {
-            background: #1f1f1f;
+            background: rgba(255,255,255,0.08);
         }
 
         .empty-state {
             text-align: center;
-            padding: 40px 20px;
+            padding: 35px 20px;
             color: #555;
         }
 
         .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 12px;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            opacity: 0.5;
         }
 
         .playlist-badge {
-            font-size: 10px;
+            font-size: 9px;
             color: #1db954;
             margin-top: 2px;
             display: block;
@@ -486,6 +540,7 @@
             width: 100%;
             height: 100%;
             background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(10px);
             display: none;
             align-items: center;
             justify-content: center;
@@ -493,8 +548,8 @@
         }
 
         .modal-content {
-            background: #282828;
-            padding: 24px;
+            background: #1a1a1a;
+            padding: 22px;
             border-radius: 24px;
             width: 85%;
             max-width: 320px;
@@ -502,32 +557,32 @@
 
         .modal-content h3 {
             margin-top: 0;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
         }
 
         .modal-content input {
             width: 100%;
-            padding: 14px;
-            background: #3e3e3e;
+            padding: 12px;
+            background: #2a2a2a;
             border: none;
             border-radius: 30px;
             color: white;
-            margin: 16px 0;
-            font-size: 14px;
+            margin: 14px 0;
+            font-size: 13px;
             outline: none;
         }
 
         .modal-buttons {
             display: flex;
             justify-content: flex-end;
-            gap: 12px;
+            gap: 10px;
         }
 
         .btn-green {
             background: #1db954;
             color: black;
             border: none;
-            padding: 10px 20px;
+            padding: 8px 18px;
             border-radius: 30px;
             font-weight: bold;
             cursor: pointer;
@@ -538,11 +593,11 @@
         }
 
         .folder-info {
-            background: #1a1a1a;
-            padding: 8px 12px;
+            background: rgba(29,185,84,0.1);
+            padding: 6px 10px;
             margin: 8px 0;
-            border-radius: 10px;
-            font-size: 11px;
+            border-radius: 8px;
+            font-size: 10px;
             color: #1db954;
             display: flex;
             justify-content: space-between;
@@ -556,8 +611,8 @@
             left: 0;
             right: 0;
             background: #1a1a1a;
-            border-radius: 20px 20px 0 0;
-            padding: 20px;
+            border-radius: 24px 24px 0 0;
+            padding: 18px;
             z-index: 250;
             transform: translateY(100%);
             transition: transform 0.3s ease;
@@ -570,28 +625,28 @@
         }
 
         .playlist-selector h4 {
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             color: #1db954;
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
 
         .playlist-option {
-            padding: 12px;
-            background: #282828;
-            border-radius: 12px;
-            margin-bottom: 10px;
+            padding: 10px;
+            background: #2a2a2a;
+            border-radius: 10px;
+            margin-bottom: 8px;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .playlist-option:active {
-            background: #3e3e3e;
+            background: #3a3a3a;
         }
 
         .create-playlist-option {
-            background: #1db95420;
+            background: rgba(29,185,84,0.15);
             border: 1px dashed #1db954;
             color: #1db954;
             justify-content: center;
@@ -604,7 +659,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.95);
+            background: rgba(0,0,0,0.98);
             z-index: 400;
             display: none;
             align-items: center;
@@ -617,11 +672,12 @@
         }
 
         .fullscreen-vinyl {
-            width: min(300px, 70vw);
-            height: min(300px, 70vw);
+            width: min(260px, 65vw);
+            height: min(260px, 65vw);
             border-radius: 50%;
-            border: 6px solid #282828;
+            border: 4px solid #282828;
             overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         }
 
         .fullscreen-vinyl img {
@@ -632,25 +688,36 @@
 
         .close-fullscreen {
             position: absolute;
-            top: 30px;
-            right: 25px;
-            font-size: 2rem;
+            top: 25px;
+            right: 20px;
+            font-size: 1.5rem;
             color: white;
             cursor: pointer;
-            background: rgba(0,0,0,0.5);
-            width: 50px;
-            height: 50px;
-            border-radius: 25px;
+            background: rgba(255,255,255,0.1);
+            width: 42px;
+            height: 42px;
+            border-radius: 21px;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .close-fullscreen:active {
+            background: rgba(255,255,255,0.2);
+            transform: scale(0.95);
         }
     </style>
 </head>
 <body>
     <div class="app">
+        <!-- HEADER -->
         <div class="header">
-            <h1>Spotify</h1>
+            <div class="logo-section">
+                <i class="fa-solid fa-music logo-icon"></i>
+                <span class="logo-text">MÚSICA PRO</span>
+                <span class="logo-badge">MP3</span>
+            </div>
             <div class="header-icons">
                 <i class="fa-solid fa-list-ul" id="queueBtn"></i>
                 <i class="fa-solid fa-bars" id="menuBtn"></i>
@@ -664,7 +731,7 @@
             </div>
             <div class="search-bar">
                 <i class="fa-solid fa-search"></i>
-                <input type="text" id="searchInput" placeholder="¿Qué quieres escuchar?">
+                <input type="text" id="searchInput" placeholder="Buscar canciones...">
             </div>
         </div>
 
@@ -673,7 +740,7 @@
                 <h2>Buenas</h2>
                 <p>🎧 Tu música, donde quieras</p>
             </div>
-            <div id="plIndicator" style="background:#1db95420; padding:8px; border-radius:10px; margin-bottom:10px; text-align:center; font-size:11px; display:none;"></div>
+            <div id="plIndicator" style="background:rgba(29,185,84,0.1); padding:6px; border-radius:8px; margin-bottom:8px; text-align:center; font-size:10px; display:none;"></div>
             <div id="folderInfo" class="folder-info" style="display:none;">
                 <span><i class="fa-solid fa-folder-open"></i> <span id="folderName"></span></span>
                 <span><i class="fa-solid fa-music"></i> <span id="trackCount">0</span> canciones</span>
@@ -681,10 +748,9 @@
             <div id="trackListContainer" class="track-list"></div>
             <div id="playlistListContainer" class="playlist-list" style="display:none;"></div>
             <div id="emptyState" class="empty-state">
-                <i class="fa-solid fa-folder-tree"></i>
-                <p>Toca el botón verde + para seleccionar una CARPETA</p>
-                <p style="font-size:12px; margin-top:8px;">Selecciona una carpeta con música MP3/MP4</p>
-                <p style="font-size:11px; margin-top:8px; color:#1db954;">La configuración se guarda automáticamente</p>
+                <i class="fa-solid fa-headphones"></i>
+                <p>Selecciona una carpeta con música MP3</p>
+                <p style="font-size:11px; margin-top:6px; color:#1db954;">Toca el botón + en el reproductor para comenzar</p>
             </div>
         </div>
 
@@ -695,6 +761,9 @@
                     <div id="playerTitle">-</div>
                     <span id="playerArtist">Sin música</span>
                     <span id="activePlaylistLabel" class="playlist-badge"></span>
+                </div>
+                <div class="player-add-btn" id="fabBtn">
+                    <i class="fa-solid fa-plus"></i>
                 </div>
             </div>
             <div class="player-controls">
@@ -712,7 +781,7 @@
                 <span class="time" id="totalTime">0:00</span>
             </div>
             <div class="volume-row">
-                <i class="fa-solid fa-volume-up" style="font-size:0.9rem; color:#b3b3b3;"></i>
+                <i class="fa-solid fa-volume-up" style="font-size:0.8rem; color:#b3b3b3;"></i>
                 <div class="vol-bar" id="volBar">
                     <div class="vol-fill" id="volFill" style="width:70%"></div>
                 </div>
@@ -723,7 +792,7 @@
     <div id="libraryDrawer" class="drawer">
         <div class="drawer-header">
             <span>📚 Tu Biblioteca</span>
-            <i class="fa-solid fa-xmark" id="closeDrawer" style="font-size:1.3rem; cursor:pointer;"></i>
+            <i class="fa-solid fa-xmark" id="closeDrawer"></i>
         </div>
         <div class="drawer-content" id="drawerContent"></div>
     </div>
@@ -731,7 +800,7 @@
     <div id="queueDrawer" class="drawer drawer-right">
         <div class="drawer-header">
             <span>⏯️ Cola de reproducción</span>
-            <i class="fa-solid fa-xmark" id="closeQueueDrawer" style="font-size:1.3rem; cursor:pointer;"></i>
+            <i class="fa-solid fa-xmark" id="closeQueueDrawer"></i>
         </div>
         <div class="drawer-content" id="queueDrawerContent"></div>
     </div>
@@ -739,8 +808,8 @@
     <div id="playlistSelector" class="playlist-selector">
         <h4><i class="fa-solid fa-list"></i> Añadir a playlist</h4>
         <div id="playlistSelectorList"></div>
-        <div style="margin-top: 15px; text-align: center;">
-            <button class="btn-green" id="closePlaylistSelector" style="padding: 10px 25px;">Cancelar</button>
+        <div style="margin-top: 12px; text-align: center;">
+            <button class="btn-green" id="closePlaylistSelector" style="padding: 8px 20px;">Cancelar</button>
         </div>
     </div>
 
@@ -751,10 +820,6 @@
         <div id="fullscreenVinyl" class="fullscreen-vinyl">
             <img id="fullscreenVinylImg" src="">
         </div>
-    </div>
-
-    <div class="fab" id="fabBtn">
-        <i class="fa-solid fa-plus"></i>
     </div>
 
     <input type="file" id="folderInput" class="hidden-input" webkitdirectory directory multiple>
@@ -796,7 +861,7 @@
         }
         
         function getCoverURL(name) { 
-            return coverCache.get(name.toLowerCase().trim()) || 'https://via.placeholder.com/150?text=♫'; 
+            return coverCache.get(name.toLowerCase().trim()) || 'https://via.placeholder.com/150?text=🎵'; 
         }
 
         // ==================== CONFIGURACIÓN (PERSISTENCIA) ====================
@@ -813,13 +878,13 @@
                 folderName: currentFolderName,
                 savedAt: new Date().toISOString()
             };
-            localStorage.setItem(`spotify_config_${currentFolderName || 'default'}`, JSON.stringify(configData));
-            localStorage.setItem('spotify_mobile_backup', JSON.stringify(configData));
+            localStorage.setItem(`musica_config_${currentFolderName || 'default'}`, JSON.stringify(configData));
+            localStorage.setItem('musica_backup', JSON.stringify(configData));
         }
 
         async function loadConfig() {
             if (currentFolderName) {
-                const saved = localStorage.getItem(`spotify_config_${currentFolderName}`);
+                const saved = localStorage.getItem(`musica_config_${currentFolderName}`);
                 if (saved) {
                     try {
                         const data = JSON.parse(saved);
@@ -851,7 +916,7 @@
                 }
             }
             
-            const backup = localStorage.getItem('spotify_mobile_backup');
+            const backup = localStorage.getItem('musica_backup');
             if(backup) {
                 try {
                     const data = JSON.parse(backup);
@@ -891,7 +956,7 @@
             }
         }
 
-        // ==================== SELECCIÓN DE CARPETA ====================
+        // ==================== SELECCIÓN DE CARPETA (SOLO MP3) ====================
         async function selectFolder() {
             const input = document.getElementById('folderInput');
             input.value = '';
@@ -915,8 +980,7 @@
                     const subFolder = pathParts2.length > 2 ? pathParts2[1] : "";
                     const ext = fileName.toLowerCase();
                     
-                    // Aceptar MP3 y MP4 (y otros formatos de audio/video)
-                    if (ext.endsWith('.mp3') || ext.endsWith('.mp4') || ext.endsWith('.m4a') || ext.endsWith('.mov') || ext.endsWith('.m4v')) {
+                    if (ext.endsWith('.mp3')) {
                         audioFiles.push(file);
                     }
                     if (subFolder.toLowerCase() === 'portadas') {
@@ -1218,7 +1282,7 @@
 
         function showFullscreenMedia() {
             const imgUrl = document.getElementById('playerCover').src;
-            if(imgUrl && imgUrl !== 'https://via.placeholder.com/150?text=♫') {
+            if(imgUrl && !imgUrl.includes('placeholder')) {
                 document.getElementById('fullscreenVinylImg').src = imgUrl;
                 document.getElementById('fullscreenMedia').classList.add('active');
             }
@@ -1249,10 +1313,8 @@
             if(currentMediaURL) URL.revokeObjectURL(currentMediaURL);
             currentMediaURL = URL.createObjectURL(file);
             
-            // TODOS los archivos (incluyendo MP4) se reproducen como AUDIO
-            // Esto hace que los MP4 se comporten exactamente igual que los MP3
             audio.src = currentMediaURL;
-            audio.play().catch(e => console.log("Error reproduciendo:", e));
+            audio.play().catch(e => console.log("Error:", e));
             active = audio;
             
             document.getElementById('playPauseBtn').className = "fa-solid fa-circle-pause play-btn";
@@ -1314,7 +1376,7 @@
             document.getElementById('modalCancel').onclick = () => modal.style.display = 'none';
         }
 
-        // ==================== DRAG EVENTS (BARRA DE TIEMPO DESLIZABLE) ====================
+        // ==================== DRAG EVENTS ====================
         function initDragEvents() {
             const progressBar = document.getElementById('progressBar');
             
@@ -1413,7 +1475,6 @@
             document.getElementById('volFill').style.width = '70%';
         }
         
-        // Exponer funciones globales
         window.addToQueue = addToQueue;
         window.playNowFromQueue = playNowFromQueue;
         window.removeFromQueue = removeFromQueue;
