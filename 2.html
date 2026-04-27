@@ -544,6 +544,19 @@
             border: 1px solid #3e3e3e;
             min-width: 180px;
         }
+
+        /* Folder info banner */
+        .folder-info {
+            background: #1a1a1a;
+            padding: 8px 12px;
+            margin: 8px 0;
+            border-radius: 12px;
+            font-size: 11px;
+            color: #1db954;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
@@ -573,6 +586,10 @@
                 <p>🎧 Tu música, donde quieras</p>
             </div>
             <div id="plIndicator" style="background:#1db95420; padding:8px; border-radius:12px; margin-bottom:12px; text-align:center; font-size:12px; display:none;"></div>
+            <div id="folderInfo" class="folder-info" style="display:none;">
+                <span><i class="fa-solid fa-folder-open"></i> <span id="folderName"></span></span>
+                <span><i class="fa-solid fa-music"></i> <span id="trackCount">0</span> canciones</span>
+            </div>
             <div class="media-area">
                 <div class="vinyl-player" id="vinylPlayer">
                     <img id="vinylImg" src="">
@@ -582,9 +599,10 @@
             <div id="trackListContainer" class="track-list"></div>
             <div id="playlistListContainer" class="playlist-list" style="display:none;"></div>
             <div id="emptyState" class="empty-state">
-                <i class="fa-solid fa-folder-music" style="font-size:3rem; margin-bottom:12px;"></i>
-                <p>Toca el botón verde + para subir tu música</p>
-                <p style="font-size:12px; margin-top:8px;">Selecciona tus archivos MP3/MP4</p>
+                <i class="fa-solid fa-folder-tree" style="font-size:3rem; margin-bottom:12px;"></i>
+                <p>Toca el botón verde + para seleccionar una CARPETA</p>
+                <p style="font-size:12px; margin-top:8px;">Selecciona una carpeta con música MP3/MP4</p>
+                <p style="font-size:11px; color:#1db954; margin-top:12px;">La carpeta "portadas" se detectará automáticamente</p>
             </div>
         </div>
 
@@ -640,10 +658,7 @@
         <i class="fa-solid fa-plus"></i>
     </div>
 
-    <!-- Input para seleccionar múltiples archivos (compatible con iPhone) -->
-    <input type="file" id="fileInput" class="hidden-input" accept=".mp3,.mp4" multiple>
-
-    <!-- Input para seleccionar carpeta (Android/PC, pero en móvil se usa el de archivos múltiples) -->
+    <!-- Input para seleccionar CARPETA completa (funciona en móvil/iPhone con webkitdirectory) -->
     <input type="file" id="folderInput" class="hidden-input" webkitdirectory directory multiple>
 
     <div id="customModal" class="modal-overlay">
@@ -657,13 +672,12 @@
         </div>
     </div>
 
-    <!-- Menú contextual móvil -->
     <div id="contextMenuMobile" class="context-menu-mobile"></div>
 
     <audio id="audioPlayer"></audio>
 
     <script>
-        // ==================== VARIABLES GLOBALES (MISMAS QUE EL ORIGINAL) ====================
+        // ==================== VARIABLES GLOBALES ====================
         let allTracks = [], filteredTracks = [], playbackHistory = [];
         let coverCache = new Map();
         let currentIndex = -1, isShuffle = false, isRepeat = false, isDragging = false;
@@ -675,6 +689,7 @@
         let contextPlaylistIndex = -1;
         let contextQueueIndex = -1;
         let activePlaylistIdx = -1;
+        let currentFolderName = "";
 
         const audio = document.getElementById('audioPlayer');
         const videoEl = document.getElementById('mobileVideo');
@@ -684,7 +699,7 @@
         function fmt(sec) { const m = Math.floor(sec/60), s = Math.floor(sec%60); return `${m}:${s<10?'0':''}${s}`; }
         function getCoverURL(name) { return coverCache.get(name.toLowerCase().trim()) || 'https://via.placeholder.com/150?text=♫'; }
 
-        // Persistencia en localStorage (misma funcionalidad que saveConfig/loadConfig pero para móvil)
+        // Guardar configuración en localStorage
         function saveToLocal() {
             const data = {
                 lastTrack: currentIndex !== -1 ? allTracks[currentIndex]?.name : null,
@@ -693,7 +708,8 @@
                 playlists: playlists,
                 isShuffle: isShuffle,
                 isRepeat: isRepeat,
-                activePlaylistIdx: activePlaylistIdx
+                activePlaylistIdx: activePlaylistIdx,
+                folderName: currentFolderName
             };
             localStorage.setItem('spotify_mobile_data', JSON.stringify(data));
         }
@@ -708,19 +724,6 @@
                     isShuffle = data.isShuffle || false;
                     isRepeat = data.isRepeat || false;
                     activePlaylistIdx = data.activePlaylistIdx !== undefined ? data.activePlaylistIdx : -1;
-                    
-                    if (data.lastTrack && allTracks.length > 0) {
-                        const idx = allTracks.findIndex(t => t.name === data.lastTrack);
-                        if (idx !== -1) {
-                            setTimeout(async () => {
-                                await playIndex(idx);
-                                active.currentTime = data.currentTime || 0;
-                                active.pause();
-                                document.getElementById('playPauseBtn').className = "fa-solid fa-circle-play play-btn";
-                                document.getElementById('vinylPlayer').style.animationPlayState = 'paused';
-                            }, 100);
-                        }
-                    }
                     updateShuffleRepeatUI();
                     updateStatusLabel();
                 } catch(e) {}
@@ -750,37 +753,103 @@
             }
         }
 
-        // ==================== SELECCIÓN DE ARCHIVOS (MÓVIL) ====================
-        function selectFolderMobile() {
-            const input = document.getElementById('fileInput');
-            input.onchange = (e) => {
+        // ==================== SELECCIÓN DE CARPETA (webkitdirectory) ====================
+        async function selectFolder() {
+            const input = document.getElementById('folderInput');
+            input.value = ''; // Reset para permitir seleccionar la misma carpeta again
+            
+            input.onchange = async (e) => {
                 const files = Array.from(e.target.files);
                 if(files.length === 0) return;
-                processFiles(files);
-            };
-            input.click();
-        }
-
-        function processFiles(files) {
-            allTracks = [];
-            coverCache.clear();
-            
-            files.forEach(file => {
-                const ext = file.name.toLowerCase();
-                if(ext.endsWith('.mp3') || ext.endsWith('.mp4')) {
-                    allTracks.push({ 
-                        name: file.name, 
-                        fileObj: file, 
-                        getFile: async () => file 
+                
+                // Obtener el nombre de la carpeta (primer archivo contiene la ruta)
+                const firstFile = files[0];
+                const pathParts = firstFile.webkitRelativePath.split('/');
+                currentFolderName = pathParts[0];
+                
+                // Limpiar datos anteriores
+                allTracks = [];
+                coverCache.clear();
+                
+                // Separar archivos de audio y archivos de portadas
+                const audioFiles = [];
+                const coverFiles = new Map();
+                
+                for (const file of files) {
+                    const relativePath = file.webkitRelativePath;
+                    const pathParts2 = relativePath.split('/');
+                    const fileName = pathParts2[pathParts2.length - 1];
+                    const folderName = pathParts2[0];
+                    const subFolder = pathParts2.length > 2 ? pathParts2[1] : "";
+                    
+                    const ext = fileName.toLowerCase();
+                    
+                    // Detectar archivos de audio
+                    if (ext.endsWith('.mp3') || ext.endsWith('.mp4')) {
+                        audioFiles.push(file);
+                    }
+                    
+                    // Detectar carpeta "portadas" (como en el original)
+                    if (subFolder.toLowerCase() === 'portadas' || folderName.toLowerCase() === 'portadas') {
+                        const nameWithoutExt = fileName.replace(/\.[^/.]+$/, "").toLowerCase().trim();
+                        coverFiles.set(nameWithoutExt, file);
+                    }
+                }
+                
+                // Procesar archivos de audio
+                for (const file of audioFiles) {
+                    allTracks.push({
+                        name: file.name,
+                        fileObj: file,
+                        getFile: async () => file
                     });
                 }
-            });
+                
+                // Procesar portadas
+                for (const [name, file] of coverFiles) {
+                    const url = URL.createObjectURL(file);
+                    coverCache.set(name, url);
+                }
+                
+                filteredTracks = [...allTracks];
+                
+                // Actualizar UI
+                renderLibrary();
+                const emptyState = document.getElementById('emptyState');
+                if(emptyState) emptyState.style.display = 'none';
+                
+                const folderInfo = document.getElementById('folderInfo');
+                if(folderInfo) {
+                    folderInfo.style.display = 'flex';
+                    document.getElementById('folderName').innerText = currentFolderName;
+                    document.getElementById('trackCount').innerText = allTracks.length;
+                }
+                
+                // Guardar y cargar configuración
+                saveToLocal();
+                
+                // Intentar cargar la última canción reproducida
+                const saved = localStorage.getItem('spotify_mobile_data');
+                if(saved) {
+                    const data = JSON.parse(saved);
+                    if(data.lastTrack && allTracks.length > 0) {
+                        const idx = allTracks.findIndex(t => t.name === data.lastTrack);
+                        if(idx !== -1) {
+                            setTimeout(async () => {
+                                await playIndex(idx);
+                                if(active && data.currentTime) {
+                                    active.currentTime = data.currentTime;
+                                    active.pause();
+                                    document.getElementById('playPauseBtn').className = "fa-solid fa-circle-play play-btn";
+                                    document.getElementById('vinylPlayer').style.animationPlayState = 'paused';
+                                }
+                            }, 100);
+                        }
+                    }
+                }
+            };
             
-            filteredTracks = [...allTracks];
-            renderLibrary();
-            document.getElementById('emptyState').style.display = 'none';
-            saveToLocal();
-            loadFromLocal();
+            input.click();
         }
 
         // ==================== RENDER BIBLIOTECA ====================
@@ -837,7 +906,7 @@
             } else {
                 trackContainer.style.display = 'none';
                 playlistContainer.style.display = 'flex';
-                playlistContainer.innerHTML = `<div class="track-item" style="justify-content:center; background:#1db954; color:black;" onclick="createPlaylist()">+ CREAR PLAYLIST</div>`;
+                playlistContainer.innerHTML = `<div class="track-item" style="justify-content:center; background:#1db954; color:black; margin-bottom:8px;" onclick="createPlaylist()">+ CREAR PLAYLIST</div>`;
                 playlists.forEach((p, i) => {
                     const div = document.createElement('div');
                     div.className = `playlist-item ${activePlaylistIdx === i ? 'active' : ''}`;
@@ -851,7 +920,6 @@
                     }
                     div.innerHTML = `${coverHtml}<div class="track-info"><div class="track-name">${p.name}</div><div class="track-artist">${p.songs.length} canciones</div></div>`;
                     div.onclick = () => { activePlaylistIdx = i; playPlaylist(i); };
-                    // Menú contextual para playlists
                     div.ontouchstart = (e) => {
                         let timer;
                         div.ontouchmove = () => clearTimeout(timer);
@@ -888,7 +956,6 @@
                         </div>
                     </div>
                 `;
-                // Manejar submenu
                 const submenuTrigger = document.getElementById('playlistSubmenuMobile');
                 const submenuContent = document.getElementById('playlistSubmenuContent');
                 if(submenuTrigger && submenuContent) {
@@ -942,7 +1009,7 @@
             document.removeEventListener('touchstart', closeContextMenu);
         }
 
-        // ==================== FUNCIONES PLAYLIST (MISMAS QUE ORIGINAL) ====================
+        // ==================== FUNCIONES PLAYLIST ====================
         function createPlaylist() {
             openModal("Nueva Playlist", (name) => {
                 if(name) {
@@ -1061,7 +1128,6 @@
                 div.setAttribute('data-qindex', qIndex);
                 div.innerHTML = `<img class="track-cover" src="${getCoverURL(cleanName)}"><div class="track-info"><div class="track-name">${t || cleanName}</div><div class="track-artist">${a || 'Desconocido'}</div></div>`;
                 div.onclick = () => playNowFromQueue(qIndex);
-                // Menú contextual en cola
                 div.ontouchstart = (e) => {
                     let timer;
                     div.ontouchmove = () => clearTimeout(timer);
@@ -1091,7 +1157,7 @@
             if(allTracks.length === 0) container.innerHTML = '<div class="empty-state">No hay música</div>';
         }
 
-        // ==================== REPRODUCCIÓN (MISMA LÓGICA QUE ORIGINAL) ====================
+        // ==================== REPRODUCCIÓN ====================
         function playPlaylist(idx) {
             const p = playlists[idx];
             if(!p.songs.length) return;
@@ -1259,7 +1325,7 @@
 
         // ==================== INICIALIZACIÓN ====================
         function init() {
-            document.getElementById('fabBtn').onclick = () => selectFolderMobile();
+            document.getElementById('fabBtn').onclick = () => selectFolder();
             document.getElementById('menuBtn').onclick = () => { renderDrawerLibrary(); document.getElementById('libraryDrawer').classList.add('open'); };
             document.getElementById('queueBtn').onclick = () => { renderQueueDrawer(); document.getElementById('queueDrawer').classList.add('open'); };
             document.getElementById('closeDrawer').onclick = () => document.getElementById('libraryDrawer').classList.remove('open');
@@ -1292,7 +1358,7 @@
             document.getElementById('volFill').style.width = '70%';
         }
         
-        // Exponer funciones globales para onclick
+        // Exponer funciones globales
         window.addToQueue = addToQueue;
         window.addToQueueFromMenu = addToQueueFromMenu;
         window.playNowFromQueue = playNowFromQueue;
