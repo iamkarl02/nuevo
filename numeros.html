@@ -8,18 +8,20 @@
         :root {
             --highlight: #4caf50;
             --discarded: #f44336;
-            --default-bg: #f0f0f0;
-            --default-border: #cccccc;
+            --default-bg: #f8f9fa;
+            --default-border: #ced4da;
             --secret-bg: #ffd700;
             --secret-border: #b8860b;
-            --primary: #2196f3;
-            --primary-dark: #1976d2;
+            --primary: #0066cc;
+            --primary-dark: #004d99;
             --danger: #ff5722;
             --danger-dark: #e64a19;
             --bg: #ffffff;
-            --controls-bg: #f9f9f9;
-            --text: #333;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --controls-bg: #f1f3f5;
+            --text: #212529;
+            --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            --radius: 16px;
+            --transition: 0.2s ease;
         }
 
         * {
@@ -30,13 +32,14 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
             background: var(--bg);
             color: var(--text);
             height: 100vh;
             overflow: hidden;
             user-select: none;
             -webkit-user-select: none;
+            touch-action: manipulation;
         }
 
         /* Pantalla inicial */
@@ -51,7 +54,7 @@
             align-items: center;
             justify-content: center;
             z-index: 1000;
-            backdrop-filter: blur(4px);
+            backdrop-filter: blur(6px);
         }
 
         #initialScreen.hidden {
@@ -61,58 +64,74 @@
         .initial-card {
             background: #fff;
             padding: 2rem;
-            border-radius: 20px;
-            box-shadow: var(--shadow);
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             text-align: center;
             max-width: 90%;
-            width: 400px;
+            width: 420px;
+            animation: slideUp 0.4s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
         .initial-card h2 {
-            margin-bottom: 1rem;
-            font-size: 1.8rem;
+            margin-bottom: 0.8rem;
+            font-size: 2rem;
             color: var(--primary-dark);
+            font-weight: 700;
         }
 
         .initial-card p {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.2rem;
             color: #666;
+            font-size: 1.1rem;
         }
 
         .initial-card input {
             width: 100%;
-            padding: 12px 15px;
-            font-size: 1.5rem;
+            padding: 14px 18px;
+            font-size: 1.6rem;
             text-align: center;
-            border: 2px solid #ddd;
-            border-radius: 12px;
-            margin-bottom: 1.5rem;
+            border: 3px solid #ddd;
+            border-radius: 16px;
+            margin-bottom: 1.2rem;
             outline: none;
-            transition: border 0.3s;
+            transition: border 0.3s, box-shadow 0.3s;
+            font-weight: 600;
         }
 
         .initial-card input:focus {
             border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.15);
         }
 
         .initial-card button {
             background: var(--primary);
             color: white;
             border: none;
-            padding: 14px 40px;
-            font-size: 1.5rem;
-            border-radius: 30px;
+            padding: 16px 40px;
+            font-size: 1.6rem;
+            border-radius: 50px;
             cursor: pointer;
             width: 100%;
             transition: background 0.3s, transform 0.1s;
-            font-weight: bold;
+            font-weight: 700;
             letter-spacing: 1px;
+            box-shadow: 0 4px 12px rgba(0, 102, 204, 0.4);
         }
 
         .initial-card button:hover {
             background: var(--primary-dark);
         }
-
         .initial-card button:active {
             transform: scale(0.97);
         }
@@ -122,27 +141,26 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
-            opacity: 1;
-            transition: opacity 0.3s;
         }
 
         #mainContainer.hidden {
             display: none;
         }
 
-        /* Área del tablero */
+        /* Tablero */
         #boardArea {
             flex: 1;
             overflow-y: auto;
-            padding: 16px 12px;
+            padding: 16px 14px;
             background: #fafafa;
+            scrollbar-width: thin;
         }
 
         #board {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-            max-width: 600px;
+            gap: 12px;
+            max-width: 620px;
             margin: 0 auto;
         }
 
@@ -154,49 +172,51 @@
             border-radius: 50%;
             background: var(--default-bg);
             border: 3px solid var(--default-border);
-            font-size: clamp(1rem, 4vw, 1.4rem);
+            font-size: clamp(1.1rem, 5vw, 1.6rem);
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.2s, border-color 0.2s, transform 0.1s, color 0.2s;
+            transition: background var(--transition), border-color var(--transition), transform 0.1s, color var(--transition), box-shadow var(--transition);
             user-select: none;
             -webkit-user-select: none;
             -webkit-touch-callout: none;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+            touch-action: manipulation;
+            will-change: transform;
         }
 
         .number-circle:active {
-            transform: scale(0.92);
+            transform: scale(0.9);
         }
 
         .number-circle.highlighted {
             background: var(--highlight);
             border-color: #2e7d32;
             color: white;
-            box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
+            box-shadow: 0 4px 10px rgba(76, 175, 80, 0.5);
         }
 
         .number-circle.discarded {
             background: var(--discarded);
             border-color: #b71c1c;
             color: white;
-            opacity: 0.75;
+            opacity: 0.7;
             text-decoration: line-through;
-            box-shadow: 0 0 8px rgba(244, 67, 54, 0.3);
+            box-shadow: 0 2px 6px rgba(244, 67, 54, 0.3);
         }
 
-        /* Área de controles */
+        /* Controles */
         #controlsArea {
             background: var(--controls-bg);
-            border-top: 2px solid #e0e0e0;
-            padding: 16px 20px;
+            border-top: 2px solid #dee2e6;
+            padding: 16px 18px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+            gap: 18px;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.06);
             z-index: 10;
         }
 
-        .range-controls {
+        .controls-row {
             display: flex;
             flex-wrap: wrap;
             align-items: center;
@@ -204,40 +224,56 @@
             gap: 10px;
         }
 
-        .range-controls label {
-            font-weight: 600;
-            margin-right: 4px;
-            font-size: 1rem;
+        .range-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            padding: 8px 14px;
+            border-radius: 30px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
-        .range-controls input {
-            width: 70px;
-            padding: 8px 10px;
+        .range-group label {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #495057;
+        }
+
+        .range-group input {
+            width: 65px;
+            padding: 10px 8px;
             font-size: 1.2rem;
             text-align: center;
-            border: 2px solid #ccc;
-            border-radius: 10px;
+            border: 2px solid #ced4da;
+            border-radius: 12px;
             outline: none;
-            transition: border 0.3s;
+            transition: border 0.3s, box-shadow 0.3s;
+            font-weight: 600;
         }
 
-        .range-controls input:focus {
+        .range-group input:focus {
             border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15);
         }
 
         .btn {
-            padding: 12px 24px;
+            padding: 14px 28px;
             border: none;
-            border-radius: 25px;
+            border-radius: 40px;
             font-size: 1.1rem;
-            font-weight: bold;
+            font-weight: 700;
             cursor: pointer;
-            transition: background 0.3s, transform 0.1s;
+            transition: background 0.3s, transform 0.1s, box-shadow 0.2s;
             letter-spacing: 0.5px;
-            min-height: 48px;
+            min-height: 52px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+            touch-action: manipulation;
         }
 
         .btn:active {
@@ -248,9 +284,9 @@
             background: var(--primary);
             color: white;
             flex: 1;
-            max-width: 200px;
+            max-width: 220px;
+            box-shadow: 0 4px 12px rgba(0, 102, 204, 0.4);
         }
-
         .btn-apply:hover {
             background: var(--primary-dark);
         }
@@ -259,75 +295,76 @@
             background: var(--danger);
             color: white;
             flex: 1;
-            max-width: 200px;
+            max-width: 220px;
+            box-shadow: 0 4px 12px rgba(255, 87, 34, 0.4);
         }
-
         .btn-change:hover {
             background: var(--danger-dark);
+        }
+
+        .range-error {
+            color: var(--danger);
+            font-size: 0.95rem;
+            font-weight: 600;
+            min-height: 1.4em;
+            text-align: center;
+            margin: 0;
         }
 
         .secret-section {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            gap: 5px;
+            gap: 8px;
         }
 
         .secret-circle {
-            width: 70px;
-            height: 70px;
+            width: 90px;
+            height: 90px;
             border-radius: 50%;
             background: var(--secret-bg);
-            border: 4px solid var(--secret-border);
+            border: 5px solid var(--secret-border);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #5d4037;
+            font-size: 3.2rem;
+            font-weight: 800;
+            color: #4a3f00;
             cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
             transition: transform 0.2s, box-shadow 0.2s;
             user-select: none;
             -webkit-user-select: none;
             -webkit-touch-callout: none;
+            touch-action: manipulation;
         }
 
         .secret-circle:active {
-            transform: scale(0.92);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transform: scale(0.9);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
         }
 
         .secret-label {
-            font-size: 0.9rem;
-            color: #666;
-            font-weight: 500;
-        }
-
-        .range-error {
-            color: var(--danger);
-            font-size: 0.9rem;
+            font-size: 1rem;
+            color: #555;
             font-weight: 600;
-            min-height: 1.2em;
-            text-align: center;
         }
 
-        /* Overlay para mostrar el número secreto */
+        /* Overlay para número gigante */
         #secretOverlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0, 0, 0, 0.9);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 2000;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s;
+            transition: opacity 0.4s;
         }
 
         #secretOverlay.visible {
@@ -336,20 +373,20 @@
         }
 
         #secretNumberDisplay {
-            font-size: min(25vw, 12rem);
+            font-size: min(35vw, 14rem);
             font-weight: 900;
-            color: white;
-            text-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
-            animation: popIn 0.4s ease-out;
+            color: #fff;
+            text-shadow: 0 0 40px rgba(255, 215, 0, 0.9), 0 0 80px rgba(255, 215, 0, 0.6);
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         @keyframes popIn {
             0% {
-                transform: scale(0.3);
+                transform: scale(0.2);
                 opacity: 0;
             }
             70% {
-                transform: scale(1.1);
+                transform: scale(1.15);
                 opacity: 1;
             }
             100% {
@@ -361,53 +398,52 @@
         /* Responsive */
         @media (max-width: 480px) {
             #board {
-                gap: 6px;
+                gap: 8px;
                 padding: 4px;
             }
-
             .number-circle {
-                font-size: 1rem;
+                font-size: 1.2rem;
                 border-width: 2px;
             }
-
             #controlsArea {
                 padding: 12px 10px;
-                gap: 10px;
+                gap: 14px;
             }
-
-            .range-controls input {
-                width: 60px;
-                padding: 6px 8px;
+            .range-group {
+                padding: 6px 10px;
+                border-radius: 25px;
+                gap: 5px;
+            }
+            .range-group input {
+                width: 55px;
+                padding: 8px 5px;
                 font-size: 1rem;
             }
-
             .btn {
-                padding: 10px 16px;
+                padding: 12px 18px;
                 font-size: 1rem;
-                min-height: 44px;
+                min-height: 48px;
             }
-
             .secret-circle {
-                width: 60px;
-                height: 60px;
-                font-size: 2rem;
+                width: 80px;
+                height: 80px;
+                font-size: 2.8rem;
             }
         }
 
-        @media (min-width: 1200px) {
+        @media (min-width: 1024px) {
             #board {
                 max-width: 700px;
             }
-
             .number-circle {
-                font-size: 1.6rem;
+                font-size: 1.8rem;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- Pantalla inicial para elegir número -->
+    <!-- Pantalla inicial -->
     <div id="initialScreen">
         <div class="initial-card">
             <h2>🎯 Adivina la Edad</h2>
@@ -418,26 +454,31 @@
         </div>
     </div>
 
-    <!-- Contenedor principal del juego -->
+    <!-- Contenedor principal -->
     <div id="mainContainer" class="hidden">
-        <!-- Tablero de números -->
         <div id="boardArea">
             <div id="board"></div>
         </div>
 
-        <!-- Controles -->
         <div id="controlsArea">
-            <div class="range-controls">
-                <label for="rangeFrom">Desde:</label>
-                <input type="number" id="rangeFrom" min="1" max="100" placeholder="1" inputmode="numeric">
-                <label for="rangeTo">Hasta:</label>
-                <input type="number" id="rangeTo" min="1" max="100" placeholder="100" inputmode="numeric">
+            <!-- Zona de rango -->
+            <div class="controls-row">
+                <div class="range-group">
+                    <label for="rangeFrom">Desde</label>
+                    <input type="number" id="rangeFrom" min="1" max="100" placeholder="1" inputmode="numeric">
+                    <label for="rangeTo">Hasta</label>
+                    <input type="number" id="rangeTo" min="1" max="100" placeholder="100" inputmode="numeric">
+                </div>
                 <button class="btn btn-apply" id="applyRangeBtn">Aplicar Rango</button>
             </div>
             <p class="range-error" id="rangeError"></p>
-            <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+
+            <!-- Zona de cambiar número -->
+            <div class="controls-row">
                 <button class="btn btn-change" id="changeNumberBtn">Cambiar número</button>
             </div>
+
+            <!-- Zona secreta -->
             <div class="secret-section">
                 <div class="secret-circle" id="secretCircle" title="Mostrar número secreto">?</div>
                 <span class="secret-label">Número secreto</span>
@@ -445,21 +486,19 @@
         </div>
     </div>
 
-    <!-- Overlay para mostrar el número secreto gigante -->
+    <!-- Overlay número gigante -->
     <div id="secretOverlay">
         <span id="secretNumberDisplay"></span>
     </div>
 
     <script>
         (function() {
-            // Estado global
             let secretNumber = null;
-            let currentRange = null; // {from, to}
-            let numberStates = new Array(101).fill('none'); // 'none', 'highlighted', 'discarded'
+            let currentRange = null;
+            let numberStates = new Array(101).fill('none');
             let secretRevealTimer = null;
             let isSecretVisible = false;
 
-            // Referencias DOM
             const initialScreen = document.getElementById('initialScreen');
             const initialInput = document.getElementById('initialNumberInput');
             const initialOkBtn = document.getElementById('initialOkBtn');
@@ -475,7 +514,6 @@
             const secretOverlay = document.getElementById('secretOverlay');
             const secretNumberDisplay = document.getElementById('secretNumberDisplay');
 
-            // Generar tablero de números 1-100
             function generateBoard() {
                 board.innerHTML = '';
                 for (let i = 1; i <= 100; i++) {
@@ -488,7 +526,6 @@
                 }
             }
 
-            // Actualizar clases CSS según el estado
             function updateNumberElement(num) {
                 const element = board.querySelector(`[data-number="${num}"]`);
                 if (!element) return;
@@ -500,14 +537,12 @@
                 }
             }
 
-            // Actualizar todos los números
             function refreshAllNumbers() {
                 for (let i = 1; i <= 100; i++) {
                     updateNumberElement(i);
                 }
             }
 
-            // Resetear todos los estados
             function resetAllStates() {
                 for (let i = 1; i <= 100; i++) {
                     numberStates[i] = 'none';
@@ -519,25 +554,24 @@
                 rangeError.textContent = '';
             }
 
-            // Manejar clic en un número
+            // Modificado: ahora cualquier número puede ser tocado y alternar
             function handleNumberClick(num) {
-                if (numberStates[num] === 'highlighted') {
-                    numberStates[num] = 'discarded';
-                    updateNumberElement(num);
-                } else if (numberStates[num] === 'discarded') {
+                if (numberStates[num] === 'none') {
                     numberStates[num] = 'highlighted';
-                    updateNumberElement(num);
+                } else if (numberStates[num] === 'highlighted') {
+                    numberStates[num] = 'discarded';
+                } else { // discarded
+                    numberStates[num] = 'highlighted';
                 }
-                // Si está 'none', no hacemos nada
+                updateNumberElement(num);
             }
 
-            // Validar y aplicar rango
             function applyRange() {
                 const from = parseInt(rangeFromInput.value.trim(), 10);
                 const to = parseInt(rangeToInput.value.trim(), 10);
 
                 if (isNaN(from) || isNaN(to)) {
-                    rangeError.textContent = 'Por favor introduce ambos números.';
+                    rangeError.textContent = 'Introduce ambos números.';
                     return;
                 }
                 if (from < 1 || from > 100 || to < 1 || to > 100) {
@@ -549,10 +583,9 @@
                     return;
                 }
 
-                // Limpiar error
                 rangeError.textContent = '';
 
-                // Resetear todos los estados
+                // Resetear estados
                 for (let i = 1; i <= 100; i++) {
                     numberStates[i] = 'none';
                 }
@@ -566,7 +599,6 @@
                 refreshAllNumbers();
             }
 
-            // Mostrar número secreto gigante durante 5 segundos
             function showSecretNumber() {
                 if (isSecretVisible || secretNumber === null) return;
 
@@ -574,7 +606,7 @@
                 secretOverlay.classList.add('visible');
                 isSecretVisible = true;
 
-                // Ocultar después de exactamente 5 segundos
+                if (secretRevealTimer) clearTimeout(secretRevealTimer);
                 secretRevealTimer = setTimeout(() => {
                     secretOverlay.classList.remove('visible');
                     isSecretVisible = false;
@@ -582,16 +614,13 @@
                 }, 5000);
             }
 
-            // Mostrar pantalla inicial para elegir o cambiar número
             function showInitialScreen() {
                 initialScreen.classList.remove('hidden');
                 initialInput.value = '';
                 initialError.textContent = '';
                 initialInput.focus();
-                // No ocultamos mainContainer aún, solo ponemos overlay encima
             }
 
-            // Confirmar número desde pantalla inicial
             function confirmInitialNumber() {
                 const value = parseInt(initialInput.value.trim(), 10);
                 if (isNaN(value) || value < 1 || value > 100) {
@@ -599,45 +628,34 @@
                     return;
                 }
 
-                // Guardar número secreto
                 secretNumber = value;
                 initialError.textContent = '';
 
-                // Resetear estados del tablero si ya había partida
+                // Resetear estados si había algo
                 if (currentRange !== null || numberStates.some(s => s !== 'none')) {
                     resetAllStates();
                 }
 
-                // Ocultar pantalla inicial y mostrar main
                 initialScreen.classList.add('hidden');
                 mainContainer.classList.remove('hidden');
-
-                // Limpiar inputs de rango
                 rangeFromInput.value = '';
                 rangeToInput.value = '';
                 rangeError.textContent = '';
             }
 
-            // Inicializar
             function init() {
                 generateBoard();
                 resetAllStates();
 
-                // Event listeners
                 initialOkBtn.addEventListener('click', confirmInitialNumber);
                 initialInput.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') confirmInitialNumber();
                 });
 
                 applyRangeBtn.addEventListener('click', applyRange);
-
-                changeNumberBtn.addEventListener('click', () => {
-                    showInitialScreen();
-                });
-
+                changeNumberBtn.addEventListener('click', showInitialScreen);
                 secretCircle.addEventListener('click', showSecretNumber);
 
-                // Permitir aplicar rango con Enter en inputs de rango
                 rangeFromInput.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') applyRange();
                 });
@@ -645,7 +663,6 @@
                     if (e.key === 'Enter') applyRange();
                 });
 
-                // Mostrar pantalla inicial al cargar
                 initialScreen.classList.remove('hidden');
                 mainContainer.classList.add('hidden');
                 initialInput.focus();
