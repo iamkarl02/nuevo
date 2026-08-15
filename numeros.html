@@ -12,16 +12,17 @@
             --default-border: #ced4da;
             --secret-bg: #ffd700;
             --secret-border: #b8860b;
-            --primary: #0066cc;
-            --primary-dark: #004d99;
-            --danger: #ff5722;
-            --danger-dark: #e64a19;
-            --bg: #ffffff;
-            --controls-bg: #f1f3f5;
+            --primary: #0d6efd;
+            --primary-dark: #0a58ca;
+            --danger: #fd7e14;
+            --danger-dark: #e06c00;
+            --bg: #f4f6f9;
+            --controls-bg: #ffffff;
             --text: #212529;
-            --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            --radius: 16px;
-            --transition: 0.2s ease;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --radius: 18px;
+            --transition: 0.25s ease;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
 
         * {
@@ -32,7 +33,7 @@
         }
 
         body {
-            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            font-family: var(--font);
             background: var(--bg);
             color: var(--text);
             height: 100vh;
@@ -40,78 +41,160 @@
             user-select: none;
             -webkit-user-select: none;
             touch-action: manipulation;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Pantalla inicial */
+        /* ========== PANTALLA INICIAL ========== */
         #initialScreen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.6);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 1000;
-            backdrop-filter: blur(6px);
+            backdrop-filter: blur(8px);
+            animation: fadeIn 0.3s ease;
         }
 
         #initialScreen.hidden {
             display: none;
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         .initial-card {
-            background: #fff;
-            padding: 2rem;
-            border-radius: 24px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            background: #ffffff;
+            padding: 2.2rem;
+            border-radius: 28px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
             text-align: center;
-            max-width: 90%;
-            width: 420px;
-            animation: slideUp 0.4s ease;
+            max-width: 95%;
+            width: 440px;
+            max-height: 92vh;
+            overflow-y: auto;
+            animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         @keyframes slideUp {
-            from {
-                transform: translateY(30px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+            from { transform: translateY(40px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         .initial-card h2 {
-            margin-bottom: 0.8rem;
+            margin-bottom: 1rem;
             font-size: 2rem;
             color: var(--primary-dark);
             font-weight: 700;
+            letter-spacing: -0.5px;
         }
 
         .initial-card p {
-            margin-bottom: 1.2rem;
-            color: #666;
-            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: #6c757d;
+            font-size: 1.05rem;
         }
 
-        .initial-card input {
+        .input-group {
+            margin-bottom: 1.2rem;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #495057;
+            font-size: 0.95rem;
+        }
+
+        .input-group input {
             width: 100%;
             padding: 14px 18px;
-            font-size: 1.6rem;
+            font-size: 1.2rem;
             text-align: center;
-            border: 3px solid #ddd;
+            border: 2px solid #e0e0e0;
             border-radius: 16px;
-            margin-bottom: 1.2rem;
             outline: none;
             transition: border 0.3s, box-shadow 0.3s;
             font-weight: 600;
+            background: #fafafa;
         }
 
-        .initial-card input:focus {
+        .input-group input:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.15);
+            box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.15);
+            background: #ffffff;
+        }
+
+        /* Interruptor (toggle) para contraseña */
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.2rem;
+            background: #f1f3f5;
+            padding: 12px 16px;
+            border-radius: 16px;
+        }
+
+        .toggle-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 1rem;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 52px;
+            height: 28px;
+            display: inline-block;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ced4da;
+            transition: 0.3s;
+            border-radius: 28px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: var(--primary);
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(24px);
         }
 
         .initial-card button {
@@ -119,14 +202,15 @@
             color: white;
             border: none;
             padding: 16px 40px;
-            font-size: 1.6rem;
+            font-size: 1.4rem;
             border-radius: 50px;
             cursor: pointer;
             width: 100%;
-            transition: background 0.3s, transform 0.1s;
+            transition: background 0.3s, transform 0.1s, box-shadow 0.2s;
             font-weight: 700;
             letter-spacing: 1px;
-            box-shadow: 0 4px 12px rgba(0, 102, 204, 0.4);
+            box-shadow: 0 6px 16px rgba(13, 110, 253, 0.4);
+            margin-top: 0.5rem;
         }
 
         .initial-card button:hover {
@@ -136,11 +220,12 @@
             transform: scale(0.97);
         }
 
-        /* Contenedor principal */
+        /* ========== CONTENEDOR PRINCIPAL ========== */
         #mainContainer {
             display: flex;
             flex-direction: column;
             height: 100vh;
+            background: var(--bg);
         }
 
         #mainContainer.hidden {
@@ -151,16 +236,17 @@
         #boardArea {
             flex: 1;
             overflow-y: auto;
-            padding: 16px 14px;
-            background: #fafafa;
+            padding: 18px 16px;
+            background: #ffffff;
+            border-bottom: 1px solid #e0e0e0;
             scrollbar-width: thin;
         }
 
         #board {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 12px;
-            max-width: 620px;
+            gap: 14px;
+            max-width: 640px;
             margin: 0 auto;
         }
 
@@ -170,8 +256,8 @@
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            background: var(--default-bg);
-            border: 3px solid var(--default-border);
+            background: #f1f3f5;
+            border: 3px solid #dee2e6;
             font-size: clamp(1.1rem, 5vw, 1.6rem);
             font-weight: 600;
             cursor: pointer;
@@ -179,7 +265,7 @@
             user-select: none;
             -webkit-user-select: none;
             -webkit-touch-callout: none;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
             touch-action: manipulation;
             will-change: transform;
         }
@@ -192,14 +278,14 @@
             background: var(--highlight);
             border-color: #2e7d32;
             color: white;
-            box-shadow: 0 4px 10px rgba(76, 175, 80, 0.5);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
         }
 
         .number-circle.discarded {
             background: var(--discarded);
             border-color: #b71c1c;
             color: white;
-            opacity: 0.7;
+            opacity: 0.65;
             text-decoration: line-through;
             box-shadow: 0 2px 6px rgba(244, 67, 54, 0.3);
         }
@@ -207,13 +293,14 @@
         /* Controles */
         #controlsArea {
             background: var(--controls-bg);
-            border-top: 2px solid #dee2e6;
-            padding: 16px 18px;
+            border-top: 2px solid #e0e0e0;
+            padding: 18px 20px;
             display: flex;
             flex-direction: column;
             gap: 18px;
-            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.04);
             z-index: 10;
+            flex-shrink: 0;
         }
 
         .controls-row {
@@ -221,19 +308,20 @@
             flex-wrap: wrap;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 12px;
         }
 
         .range-group {
             display: flex;
             align-items: center;
             gap: 8px;
-            background: white;
-            padding: 8px 14px;
-            border-radius: 30px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            background: #f8f9fa;
+            padding: 10px 16px;
+            border-radius: 40px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
             flex-wrap: wrap;
             justify-content: center;
+            border: 1px solid #e9ecef;
         }
 
         .range-group label {
@@ -243,24 +331,25 @@
         }
 
         .range-group input {
-            width: 65px;
+            width: 62px;
             padding: 10px 8px;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             text-align: center;
             border: 2px solid #ced4da;
             border-radius: 12px;
             outline: none;
             transition: border 0.3s, box-shadow 0.3s;
             font-weight: 600;
+            background: #ffffff;
         }
 
         .range-group input:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15);
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
         }
 
         .btn {
-            padding: 14px 28px;
+            padding: 14px 26px;
             border: none;
             border-radius: 40px;
             font-size: 1.1rem;
@@ -272,8 +361,9 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             touch-action: manipulation;
+            white-space: nowrap;
         }
 
         .btn:active {
@@ -284,55 +374,52 @@
             background: var(--primary);
             color: white;
             flex: 1;
-            max-width: 220px;
-            box-shadow: 0 4px 12px rgba(0, 102, 204, 0.4);
+            max-width: 200px;
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.35);
         }
-        .btn-apply:hover {
-            background: var(--primary-dark);
-        }
+        .btn-apply:hover { background: var(--primary-dark); }
 
         .btn-change {
             background: var(--danger);
             color: white;
             flex: 1;
-            max-width: 220px;
-            box-shadow: 0 4px 12px rgba(255, 87, 34, 0.4);
+            max-width: 200px;
+            box-shadow: 0 4px 12px rgba(253, 126, 20, 0.35);
         }
-        .btn-change:hover {
-            background: var(--danger-dark);
-        }
+        .btn-change:hover { background: var(--danger-dark); }
 
         .range-error {
-            color: var(--danger);
-            font-size: 0.95rem;
+            color: #d32f2f;
+            font-size: 0.9rem;
             font-weight: 600;
             min-height: 1.4em;
             text-align: center;
             margin: 0;
         }
 
+        /* Sección secreta */
         .secret-section {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .secret-circle {
-            width: 90px;
-            height: 90px;
+            width: 96px;
+            height: 96px;
             border-radius: 50%;
-            background: var(--secret-bg);
+            background: linear-gradient(145deg, #ffd700, #ffb300);
             border: 5px solid var(--secret-border);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 3.2rem;
+            font-size: 3.4rem;
             font-weight: 800;
             color: #4a3f00;
             cursor: pointer;
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
-            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), inset 0 2px 4px rgba(255,255,255,0.4);
+            transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
             user-select: none;
             -webkit-user-select: none;
             -webkit-touch-callout: none;
@@ -341,16 +428,41 @@
 
         .secret-circle:active {
             transform: scale(0.9);
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .secret-circle.confirm-wait {
+            background: linear-gradient(145deg, #ff9800, #f57c00);
+            border-color: #e65100;
+            color: #3e2723;
+            animation: pulse 1.2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.06); }
         }
 
         .secret-label {
             font-size: 1rem;
-            color: #555;
+            color: #6c757d;
             font-weight: 600;
         }
 
-        /* Overlay para número gigante */
+        .confirm-hint {
+            font-size: 0.9rem;
+            color: #e65100;
+            font-weight: 700;
+            min-height: 1.2em;
+            animation: fadeInHint 0.3s;
+        }
+
+        @keyframes fadeInHint {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Overlay número gigante */
         #secretOverlay {
             position: fixed;
             top: 0;
@@ -365,6 +477,7 @@
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.4s;
+            backdrop-filter: blur(4px);
         }
 
         #secretOverlay.visible {
@@ -381,63 +494,109 @@
         }
 
         @keyframes popIn {
-            0% {
-                transform: scale(0.2);
-                opacity: 0;
-            }
-            70% {
-                transform: scale(1.15);
-                opacity: 1;
-            }
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
+            0% { transform: scale(0.2); opacity: 0; }
+            70% { transform: scale(1.15); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Overlay de contraseña */
+        #passwordOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1500;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            backdrop-filter: blur(4px);
+        }
+
+        #passwordOverlay.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .password-card {
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+            text-align: center;
+            max-width: 90%;
+            width: 360px;
+            animation: slideUp 0.3s ease;
+        }
+
+        .password-card h3 {
+            margin-bottom: 1rem;
+            font-size: 1.4rem;
+            color: #333;
+        }
+
+        .password-card input {
+            width: 100%;
+            padding: 14px;
+            font-size: 1.2rem;
+            text-align: center;
+            border: 2px solid #e0e0e0;
+            border-radius: 14px;
+            outline: none;
+            margin-bottom: 1rem;
+            transition: border 0.3s;
+            background: #fafafa;
+        }
+
+        .password-card input:focus {
+            border-color: var(--primary);
+        }
+
+        .password-card button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 700;
+            width: 100%;
+            transition: background 0.3s;
+        }
+
+        .password-card button:hover {
+            background: var(--primary-dark);
+        }
+
+        .password-error {
+            color: #d32f2f;
+            font-weight: 600;
+            font-size: 0.9rem;
+            min-height: 1.2em;
+            margin-top: 8px;
         }
 
         /* Responsive */
         @media (max-width: 480px) {
-            #board {
-                gap: 8px;
-                padding: 4px;
-            }
-            .number-circle {
-                font-size: 1.2rem;
-                border-width: 2px;
-            }
-            #controlsArea {
-                padding: 12px 10px;
-                gap: 14px;
-            }
-            .range-group {
-                padding: 6px 10px;
-                border-radius: 25px;
-                gap: 5px;
-            }
-            .range-group input {
-                width: 55px;
-                padding: 8px 5px;
-                font-size: 1rem;
-            }
-            .btn {
-                padding: 12px 18px;
-                font-size: 1rem;
-                min-height: 48px;
-            }
-            .secret-circle {
-                width: 80px;
-                height: 80px;
-                font-size: 2.8rem;
-            }
+            #board { gap: 8px; padding: 4px; }
+            .number-circle { font-size: 1.2rem; border-width: 2px; }
+            #controlsArea { padding: 14px 12px; gap: 14px; }
+            .range-group { padding: 8px 12px; border-radius: 30px; gap: 5px; }
+            .range-group input { width: 54px; padding: 8px 5px; font-size: 1rem; }
+            .btn { padding: 12px 18px; font-size: 1rem; min-height: 48px; }
+            .secret-circle { width: 82px; height: 82px; font-size: 2.8rem; }
+            .initial-card { padding: 1.8rem; }
+            .toggle-row { padding: 10px 12px; }
         }
 
         @media (min-width: 1024px) {
-            #board {
-                max-width: 700px;
-            }
-            .number-circle {
-                font-size: 1.8rem;
-            }
+            #board { max-width: 720px; }
+            .number-circle { font-size: 1.8rem; }
         }
     </style>
 </head>
@@ -448,9 +607,27 @@
         <div class="initial-card">
             <h2>🎯 Adivina la Edad</h2>
             <p>Elige un número secreto del 1 al 100</p>
-            <input type="number" id="initialNumberInput" min="1" max="100" placeholder="1-100" inputmode="numeric">
+
+            <div class="input-group">
+                <label for="initialNumberInput">Número secreto</label>
+                <input type="number" id="initialNumberInput" min="1" max="100" placeholder="1-100" inputmode="numeric">
+            </div>
+
+            <div class="toggle-row">
+                <span class="toggle-label">Proteger con contraseña</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="usePasswordCheckbox">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
+            <div class="input-group" id="passwordGroup" style="display:none;">
+                <label for="initialPasswordInput">Contraseña</label>
+                <input type="password" id="initialPasswordInput" placeholder="Contraseña">
+            </div>
+
             <button id="initialOkBtn">OK</button>
-            <p id="initialError" style="color: var(--danger); font-weight:600; margin-top:10px; min-height:1.2em;"></p>
+            <p id="initialError" style="color: #d32f2f; font-weight:600; margin-top:10px; min-height:1.2em;"></p>
         </div>
     </div>
 
@@ -461,7 +638,6 @@
         </div>
 
         <div id="controlsArea">
-            <!-- Zona de rango -->
             <div class="controls-row">
                 <div class="range-group">
                     <label for="rangeFrom">Desde</label>
@@ -473,16 +649,25 @@
             </div>
             <p class="range-error" id="rangeError"></p>
 
-            <!-- Zona de cambiar número -->
             <div class="controls-row">
                 <button class="btn btn-change" id="changeNumberBtn">Cambiar número</button>
             </div>
 
-            <!-- Zona secreta -->
             <div class="secret-section">
                 <div class="secret-circle" id="secretCircle" title="Mostrar número secreto">?</div>
                 <span class="secret-label">Número secreto</span>
+                <span class="confirm-hint" id="confirmHint"></span>
             </div>
+        </div>
+    </div>
+
+    <!-- Overlay de contraseña -->
+    <div id="passwordOverlay">
+        <div class="password-card">
+            <h3>🔒 Introduce la contraseña</h3>
+            <input type="password" id="passwordInput" placeholder="Contraseña">
+            <button id="passwordOkBtn">Confirmar</button>
+            <p class="password-error" id="passwordError"></p>
         </div>
     </div>
 
@@ -494,15 +679,23 @@
     <script>
         (function() {
             let secretNumber = null;
+            let secretPassword = null;
             let currentRange = null;
             let numberStates = new Array(101).fill('none');
             let secretRevealTimer = null;
             let isSecretVisible = false;
+            let confirmTimer = null;
+            let waitingForSecondConfirm = false;
+            let passwordVerified = false;
 
             const initialScreen = document.getElementById('initialScreen');
             const initialInput = document.getElementById('initialNumberInput');
             const initialOkBtn = document.getElementById('initialOkBtn');
             const initialError = document.getElementById('initialError');
+            const usePasswordCheckbox = document.getElementById('usePasswordCheckbox');
+            const passwordGroup = document.getElementById('passwordGroup');
+            const initialPasswordInput = document.getElementById('initialPasswordInput');
+
             const mainContainer = document.getElementById('mainContainer');
             const board = document.getElementById('board');
             const rangeFromInput = document.getElementById('rangeFrom');
@@ -511,8 +704,26 @@
             const rangeError = document.getElementById('rangeError');
             const changeNumberBtn = document.getElementById('changeNumberBtn');
             const secretCircle = document.getElementById('secretCircle');
+            const confirmHint = document.getElementById('confirmHint');
+
             const secretOverlay = document.getElementById('secretOverlay');
             const secretNumberDisplay = document.getElementById('secretNumberDisplay');
+
+            const passwordOverlay = document.getElementById('passwordOverlay');
+            const passwordInput = document.getElementById('passwordInput');
+            const passwordOkBtn = document.getElementById('passwordOkBtn');
+            const passwordError = document.getElementById('passwordError');
+
+            // Mostrar/ocultar grupo de contraseña
+            usePasswordCheckbox.addEventListener('change', () => {
+                if (usePasswordCheckbox.checked) {
+                    passwordGroup.style.display = 'block';
+                    initialPasswordInput.focus();
+                } else {
+                    passwordGroup.style.display = 'none';
+                    initialPasswordInput.value = '';
+                }
+            });
 
             function generateBoard() {
                 board.innerHTML = '';
@@ -530,39 +741,29 @@
                 const element = board.querySelector(`[data-number="${num}"]`);
                 if (!element) return;
                 element.classList.remove('highlighted', 'discarded');
-                if (numberStates[num] === 'highlighted') {
-                    element.classList.add('highlighted');
-                } else if (numberStates[num] === 'discarded') {
-                    element.classList.add('discarded');
-                }
+                if (numberStates[num] === 'highlighted') element.classList.add('highlighted');
+                else if (numberStates[num] === 'discarded') element.classList.add('discarded');
             }
 
             function refreshAllNumbers() {
-                for (let i = 1; i <= 100; i++) {
-                    updateNumberElement(i);
-                }
+                for (let i = 1; i <= 100; i++) updateNumberElement(i);
             }
 
             function resetAllStates() {
-                for (let i = 1; i <= 100; i++) {
-                    numberStates[i] = 'none';
-                }
+                for (let i = 1; i <= 100; i++) numberStates[i] = 'none';
                 refreshAllNumbers();
                 currentRange = null;
                 rangeFromInput.value = '';
                 rangeToInput.value = '';
                 rangeError.textContent = '';
+                resetConfirmState();
+                passwordVerified = false;
             }
 
-            // Modificado: ahora cualquier número puede ser tocado y alternar
             function handleNumberClick(num) {
-                if (numberStates[num] === 'none') {
-                    numberStates[num] = 'highlighted';
-                } else if (numberStates[num] === 'highlighted') {
-                    numberStates[num] = 'discarded';
-                } else { // discarded
-                    numberStates[num] = 'highlighted';
-                }
+                if (numberStates[num] === 'none') numberStates[num] = 'highlighted';
+                else if (numberStates[num] === 'highlighted') numberStates[num] = 'discarded';
+                else numberStates[num] = 'highlighted';
                 updateNumberElement(num);
             }
 
@@ -570,38 +771,86 @@
                 const from = parseInt(rangeFromInput.value.trim(), 10);
                 const to = parseInt(rangeToInput.value.trim(), 10);
 
-                if (isNaN(from) || isNaN(to)) {
-                    rangeError.textContent = 'Introduce ambos números.';
-                    return;
-                }
-                if (from < 1 || from > 100 || to < 1 || to > 100) {
-                    rangeError.textContent = 'Los números deben estar entre 1 y 100.';
-                    return;
-                }
-                if (from > to) {
-                    rangeError.textContent = 'El "Desde" debe ser menor o igual que "Hasta".';
-                    return;
-                }
+                if (isNaN(from) || isNaN(to)) { rangeError.textContent = 'Introduce ambos números.'; return; }
+                if (from < 1 || from > 100 || to < 1 || to > 100) { rangeError.textContent = 'Los números deben estar entre 1 y 100.'; return; }
+                if (from > to) { rangeError.textContent = 'El "Desde" debe ser menor o igual que "Hasta".'; return; }
 
                 rangeError.textContent = '';
-
-                // Resetear estados
-                for (let i = 1; i <= 100; i++) {
-                    numberStates[i] = 'none';
-                }
-
-                // Marcar rango
-                for (let i = from; i <= to; i++) {
-                    numberStates[i] = 'highlighted';
-                }
-
+                for (let i = 1; i <= 100; i++) numberStates[i] = 'none';
+                for (let i = from; i <= to; i++) numberStates[i] = 'highlighted';
                 currentRange = { from, to };
                 refreshAllNumbers();
+            }
+
+            function resetConfirmState() {
+                waitingForSecondConfirm = false;
+                if (confirmTimer) { clearTimeout(confirmTimer); confirmTimer = null; }
+                secretCircle.classList.remove('confirm-wait');
+                confirmHint.textContent = '';
             }
 
             function showSecretNumber() {
                 if (isSecretVisible || secretNumber === null) return;
 
+                // Si hay contraseña y aún no la ha verificado
+                if (secretPassword && !passwordVerified) {
+                    showPasswordOverlay();
+                    return;
+                }
+
+                // Doble confirmación
+                if (!waitingForSecondConfirm) {
+                    waitingForSecondConfirm = true;
+                    secretCircle.classList.add('confirm-wait');
+                    confirmHint.textContent = '¡Toca otra vez para confirmar! (3 seg)';
+                    confirmTimer = setTimeout(() => {
+                        waitingForSecondConfirm = false;
+                        secretCircle.classList.remove('confirm-wait');
+                        confirmHint.textContent = '';
+                    }, 3000);
+                    return;
+                }
+
+                // Segunda confirmación
+                resetConfirmState();
+                revealSecretNumber();
+            }
+
+            function showPasswordOverlay() {
+                passwordOverlay.classList.add('visible');
+                passwordInput.value = '';
+                passwordError.textContent = '';
+                setTimeout(() => passwordInput.focus(), 100);
+            }
+
+            function hidePasswordOverlay() {
+                passwordOverlay.classList.remove('visible');
+            }
+
+            function verifyPassword() {
+                const entered = passwordInput.value;
+                if (entered === secretPassword) {
+                    passwordVerified = true;
+                    hidePasswordOverlay();
+                    // Iniciar doble confirmación después de verificar contraseña
+                    if (!waitingForSecondConfirm) {
+                        waitingForSecondConfirm = true;
+                        secretCircle.classList.add('confirm-wait');
+                        confirmHint.textContent = '¡Toca el círculo dos veces para revelar! (3 seg)';
+                        confirmTimer = setTimeout(() => {
+                            waitingForSecondConfirm = false;
+                            secretCircle.classList.remove('confirm-wait');
+                            confirmHint.textContent = '';
+                        }, 3000);
+                    }
+                } else {
+                    passwordError.textContent = 'Contraseña incorrecta';
+                    passwordInput.value = '';
+                    passwordInput.focus();
+                }
+            }
+
+            function revealSecretNumber() {
                 secretNumberDisplay.textContent = secretNumber;
                 secretOverlay.classList.add('visible');
                 isSecretVisible = true;
@@ -611,14 +860,20 @@
                     secretOverlay.classList.remove('visible');
                     isSecretVisible = false;
                     secretRevealTimer = null;
+                    passwordVerified = false; // Resetear verificación
                 }, 5000);
             }
 
             function showInitialScreen() {
+                resetConfirmState();
                 initialScreen.classList.remove('hidden');
                 initialInput.value = '';
+                initialPasswordInput.value = '';
+                usePasswordCheckbox.checked = false;
+                passwordGroup.style.display = 'none';
                 initialError.textContent = '';
                 initialInput.focus();
+                passwordVerified = false;
             }
 
             function confirmInitialNumber() {
@@ -628,10 +883,20 @@
                     return;
                 }
 
+                if (usePasswordCheckbox.checked) {
+                    if (initialPasswordInput.value.trim() === '') {
+                        initialError.textContent = 'Introduce una contraseña o desactiva la opción.';
+                        return;
+                    }
+                    secretPassword = initialPasswordInput.value;
+                } else {
+                    secretPassword = null;
+                }
+
                 secretNumber = value;
                 initialError.textContent = '';
+                passwordVerified = false;
 
-                // Resetear estados si había algo
                 if (currentRange !== null || numberStates.some(s => s !== 'none')) {
                     resetAllStates();
                 }
@@ -641,6 +906,7 @@
                 rangeFromInput.value = '';
                 rangeToInput.value = '';
                 rangeError.textContent = '';
+                confirmHint.textContent = '';
             }
 
             function init() {
@@ -648,19 +914,21 @@
                 resetAllStates();
 
                 initialOkBtn.addEventListener('click', confirmInitialNumber);
-                initialInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') confirmInitialNumber();
-                });
+                initialInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') confirmInitialNumber(); });
+                initialPasswordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') confirmInitialNumber(); });
 
                 applyRangeBtn.addEventListener('click', applyRange);
                 changeNumberBtn.addEventListener('click', showInitialScreen);
                 secretCircle.addEventListener('click', showSecretNumber);
 
-                rangeFromInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') applyRange();
-                });
-                rangeToInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') applyRange();
+                rangeFromInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') applyRange(); });
+                rangeToInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') applyRange(); });
+
+                passwordOkBtn.addEventListener('click', verifyPassword);
+                passwordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') verifyPassword(); });
+
+                passwordOverlay.addEventListener('click', (e) => {
+                    if (e.target === passwordOverlay) hidePasswordOverlay();
                 });
 
                 initialScreen.classList.remove('hidden');
