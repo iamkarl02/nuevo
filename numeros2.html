@@ -10,8 +10,6 @@
             --discarded: #f44336;
             --default-bg: #f1f3f5;
             --default-border: #ced4da;
-            --secret-bg: #ffd700;
-            --secret-border: #b8860b;
             --primary: #0d6efd;
             --primary-dark: #0a58ca;
             --danger: #fd7e14;
@@ -60,15 +58,8 @@
             backdrop-filter: blur(8px);
             animation: fadeIn 0.3s ease;
         }
-
-        #initialScreen.hidden {
-            display: none;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
+        #initialScreen.hidden { display: none; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         .initial-card {
             background: #ffffff;
@@ -82,594 +73,185 @@
             overflow-y: auto;
             animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-
         @keyframes slideUp {
             from { transform: translateY(40px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
-
-        .initial-card h2 {
-            margin-bottom: 1rem;
-            font-size: 1.8rem;
-            color: var(--primary-dark);
-            font-weight: 700;
-        }
-
-        .initial-card p {
-            margin-bottom: 1.5rem;
-            color: #6c757d;
-            font-size: 1rem;
-        }
-
-        .input-group {
-            margin-bottom: 1.2rem;
-            text-align: left;
-        }
-
-        .input-group label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: #495057;
-            font-size: 0.95rem;
-        }
-
+        .initial-card h2 { margin-bottom: 1rem; font-size: 1.8rem; color: var(--primary-dark); font-weight: 700; }
+        .initial-card p { margin-bottom: 1.5rem; color: #6c757d; font-size: 1rem; }
+        .input-group { margin-bottom: 1.2rem; text-align: left; }
+        .input-group label { display: block; font-weight: 600; margin-bottom: 6px; color: #495057; font-size: 0.95rem; }
         .input-group input {
-            width: 100%;
-            padding: 14px 18px;
-            font-size: 1.2rem;
-            text-align: center;
-            border: 2px solid #e0e0e0;
-            border-radius: 16px;
-            outline: none;
-            transition: border 0.3s, box-shadow 0.3s;
-            font-weight: 600;
-            background: #fafafa;
+            width: 100%; padding: 14px 18px; font-size: 1.2rem; text-align: center;
+            border: 2px solid #e0e0e0; border-radius: 16px; outline: none;
+            transition: border 0.3s, box-shadow 0.3s; font-weight: 600; background: #fafafa;
         }
-
         .input-group input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.15);
-            background: #ffffff;
+            border-color: var(--primary); box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.15); background: #ffffff;
         }
-
         .toggle-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1.2rem;
-            background: #f1f3f5;
-            padding: 12px 16px;
-            border-radius: 16px;
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 1.2rem; background: #f1f3f5; padding: 12px 16px; border-radius: 16px;
         }
-
-        .toggle-label {
-            font-weight: 600;
-            color: #495057;
-            font-size: 1rem;
-        }
-
-        .toggle-switch {
-            position: relative;
-            width: 52px;
-            height: 28px;
-            display: inline-block;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
+        .toggle-label { font-weight: 600; color: #495057; font-size: 1rem; }
+        .toggle-switch { position: relative; width: 52px; height: 28px; display: inline-block; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
         .toggle-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ced4da;
-            transition: 0.3s;
-            border-radius: 28px;
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ced4da; transition: 0.3s; border-radius: 28px;
         }
-
         .toggle-slider:before {
-            position: absolute;
-            content: "";
-            height: 20px;
-            width: 20px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: 0.3s;
-            border-radius: 50%;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px;
+            background-color: white; transition: 0.3s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
-
-        .toggle-switch input:checked + .toggle-slider {
-            background-color: var(--primary);
-        }
-
-        .toggle-switch input:checked + .toggle-slider:before {
-            transform: translateX(24px);
-        }
-
+        .toggle-switch input:checked + .toggle-slider { background-color: var(--primary); }
+        .toggle-switch input:checked + .toggle-slider:before { transform: translateX(24px); }
         .initial-card button {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 14px 40px;
-            font-size: 1.4rem;
-            border-radius: 50px;
-            cursor: pointer;
-            width: 100%;
-            transition: background 0.3s, transform 0.1s, box-shadow 0.2s;
-            font-weight: 700;
-            letter-spacing: 1px;
-            box-shadow: 0 6px 16px rgba(13, 110, 253, 0.4);
-            margin-top: 0.5rem;
+            background: var(--primary); color: white; border: none; padding: 14px 40px;
+            font-size: 1.4rem; border-radius: 50px; cursor: pointer; width: 100%;
+            transition: background 0.3s, transform 0.1s, box-shadow 0.2s; font-weight: 700;
+            letter-spacing: 1px; box-shadow: 0 6px 16px rgba(13, 110, 253, 0.4); margin-top: 0.5rem;
         }
-
-        .initial-card button:hover {
-            background: var(--primary-dark);
-        }
-        .initial-card button:active {
-            transform: scale(0.97);
-        }
-
+        .initial-card button:hover { background: var(--primary-dark); }
+        .initial-card button:active { transform: scale(0.97); }
         .btn-random {
-            background: #6c757d !important;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
-            margin-top: 10px !important;
-            font-size: 1.2rem !important;
+            background: #6c757d !important; box-shadow: 0 4px 10px rgba(0,0,0,0.1) !important;
+            margin-top: 10px !important; font-size: 1.2rem !important;
         }
-        .btn-random:hover {
-            background: #5a6268 !important;
-        }
+        .btn-random:hover { background: #5a6268 !important; }
 
         /* ========== CONTENEDOR PRINCIPAL ========== */
-        #mainContainer {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            background: var(--bg);
-        }
+        #mainContainer { display: flex; flex-direction: column; height: 100vh; background: var(--bg); }
+        #mainContainer.hidden { display: none; }
 
-        #mainContainer.hidden {
-            display: none;
-        }
-
-        /* Tablero */
         #boardArea {
-            flex: 1;
-            overflow-y: auto;
-            padding: 12px 8px;
-            background: #ffffff;
-            border-bottom: 1px solid #e0e0e0;
-            scrollbar-width: thin;
-            touch-action: manipulation;
+            flex: 1; overflow-y: auto; padding: 12px 8px; background: #ffffff;
+            border-bottom: 1px solid #e0e0e0; scrollbar-width: thin;
         }
-
         #board {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
-            max-width: 640px;
-            margin: 0 auto;
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
+            max-width: 640px; margin: 0 auto;
         }
-
         .number-circle {
-            aspect-ratio: 1 / 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            background: #f1f3f5;
-            border: 3px solid #dee2e6;
-            font-size: clamp(1.2rem, 5vw, 1.6rem);
-            font-weight: 600;
-            cursor: pointer;
+            aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; background: #f1f3f5; border: 3px solid #dee2e6;
+            font-size: clamp(1.2rem, 5vw, 1.6rem); font-weight: 600; cursor: pointer;
             transition: background var(--transition), border-color var(--transition), transform 0.1s, color var(--transition), box-shadow var(--transition);
-            user-select: none;
-            -webkit-user-select: none;
-            -webkit-touch-callout: none;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-            touch-action: manipulation;
-            will-change: transform;
+            user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06); touch-action: manipulation; will-change: transform;
         }
-
-        .number-circle:active {
-            transform: scale(0.9);
-        }
-
+        .number-circle:active { transform: scale(0.9); }
         .number-circle.highlighted {
-            background: var(--highlight);
-            border-color: #2e7d32;
-            color: white;
+            background: var(--highlight); border-color: #2e7d32; color: white;
             box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
         }
-
         .number-circle.discarded {
-            background: var(--discarded);
-            border-color: #b71c1c;
-            color: white;
-            opacity: 0.65;
-            text-decoration: line-through;
-            box-shadow: 0 2px 6px rgba(244, 67, 54, 0.3);
+            background: var(--discarded); border-color: #b71c1c; color: white;
+            opacity: 0.65; text-decoration: line-through; box-shadow: 0 2px 6px rgba(244, 67, 54, 0.3);
         }
 
         /* Barra inferior compacta */
         #bottomBar {
-            background: var(--controls-bg);
-            border-top: 2px solid #e0e0e0;
-            padding: 10px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.04);
-            z-index: 20;
-            flex-shrink: 0;
-            touch-action: manipulation;
+            background: var(--controls-bg); border-top: 2px solid #e0e0e0;
+            padding: 10px 16px; display: flex; align-items: center; justify-content: center;
+            gap: 12px; box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.04); z-index: 20; flex-shrink: 0;
         }
-
         .menu-btn {
-            background: #f1f3f5;
-            border: none;
-            border-radius: 50%;
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            transition: background 0.2s, transform 0.1s;
-            touch-action: manipulation;
-            color: #495057;
+            background: #f1f3f5; border: none; border-radius: 50%; width: 48px; height: 48px;
+            display: flex; align-items: center; justify-content: center; font-size: 1.8rem;
+            cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: background 0.2s, transform 0.1s;
+            touch-action: manipulation; color: #495057;
         }
-
-        .menu-btn:active {
-            transform: scale(0.9);
-            background: #e9ecef;
-        }
-
-        .secret-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            flex: 1;
-            cursor: pointer;
-        }
-
-        .secret-circle {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            background: linear-gradient(145deg, #ffd700, #ffb300);
-            border: 4px solid var(--secret-border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.8rem;
-            font-weight: 800;
-            color: #4a3f00;
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2), inset 0 2px 4px rgba(255,255,255,0.4);
-            transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
-            user-select: none;
-            -webkit-user-select: none;
-            -webkit-touch-callout: none;
-            touch-action: manipulation;
-        }
-
-        .secret-circle:active {
-            transform: scale(0.9);
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .secret-circle.confirm-wait {
-            background: linear-gradient(145deg, #ff9800, #f57c00);
-            border-color: #e65100;
-            color: #3e2723;
-            animation: pulse 1.2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.06); }
-        }
-
-        .secret-label {
-            font-size: 0.8rem;
-            color: #6c757d;
-            font-weight: 600;
-        }
-
-        .confirm-hint {
-            font-size: 0.85rem;
-            color: #e65100;
-            font-weight: 700;
-            min-height: 1.2em;
-            animation: fadeInHint 0.3s;
-        }
-
-        @keyframes fadeInHint {
-            from { opacity: 0; transform: translateY(-4px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .menu-btn:active { transform: scale(0.9); background: #e9ecef; }
 
         /* Menú deslizable (bottom sheet) */
         #controlsMenu {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: #ffffff;
-            border-radius: 24px 24px 0 0;
-            box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2);
-            z-index: 500;
-            padding: 20px 20px 30px;
-            transform: translateY(100%);
+            position: fixed; bottom: 0; left: 0; width: 100%; background: #ffffff;
+            border-radius: 24px 24px 0 0; box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2);
+            z-index: 500; padding: 20px 20px 30px; transform: translateY(100%);
             transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-            max-height: 70vh;
-            overflow-y: auto;
+            max-height: 70vh; overflow-y: auto;
         }
-
-        #controlsMenu.visible {
-            transform: translateY(0);
-        }
-
-        .menu-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 18px;
-        }
-
-        .menu-title {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: #333;
-        }
-
+        #controlsMenu.visible { transform: translateY(0); }
+        .menu-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+        .menu-title { font-size: 1.4rem; font-weight: 700; color: #333; }
         .close-menu-btn {
-            background: none;
-            border: none;
-            font-size: 2rem;
-            cursor: pointer;
-            color: #6c757d;
-            padding: 8px;
-            border-radius: 50%;
-            transition: background 0.2s;
-            line-height: 1;
+            background: none; border: none; font-size: 2rem; cursor: pointer;
+            color: #6c757d; padding: 8px; border-radius: 50%; transition: background 0.2s; line-height: 1;
         }
-
-        .close-menu-btn:hover {
-            background: #f1f3f5;
-        }
-
+        .close-menu-btn:hover { background: #f1f3f5; }
         .range-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #f8f9fa;
-            padding: 12px 16px;
-            border-radius: 20px;
-            margin-bottom: 12px;
-            flex-wrap: wrap;
-            justify-content: center;
-            border: 1px solid #e9ecef;
+            display: flex; align-items: center; gap: 10px; background: #f8f9fa;
+            padding: 12px 16px; border-radius: 20px; margin-bottom: 12px;
+            flex-wrap: wrap; justify-content: center; border: 1px solid #e9ecef;
         }
-
-        .range-group label {
-            font-weight: 600;
-            font-size: 1rem;
-            color: #495057;
-        }
-
+        .range-group label { font-weight: 600; font-size: 1rem; color: #495057; }
         .range-group input {
-            width: 60px;
-            padding: 10px 8px;
-            font-size: 1.1rem;
-            text-align: center;
-            border: 2px solid #ced4da;
-            border-radius: 12px;
-            outline: none;
-            transition: border 0.3s, box-shadow 0.3s;
-            font-weight: 600;
-            background: #ffffff;
+            width: 60px; padding: 10px 8px; font-size: 1.1rem; text-align: center;
+            border: 2px solid #ced4da; border-radius: 12px; outline: none;
+            transition: border 0.3s, box-shadow 0.3s; font-weight: 600; background: #ffffff;
         }
-
-        .range-group input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
-        }
-
+        .range-group input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15); }
         .btn {
-            padding: 14px 24px;
-            border: none;
-            border-radius: 40px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background 0.3s, transform 0.1s, box-shadow 0.2s;
-            letter-spacing: 0.5px;
-            min-height: 52px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            touch-action: manipulation;
-            white-space: nowrap;
-            width: 100%;
+            padding: 14px 24px; border: none; border-radius: 40px; font-size: 1.1rem;
+            font-weight: 700; cursor: pointer; transition: background 0.3s, transform 0.1s, box-shadow 0.2s;
+            letter-spacing: 0.5px; min-height: 52px; display: inline-flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); touch-action: manipulation; white-space: nowrap; width: 100%;
         }
-
-        .btn:active {
-            transform: scale(0.96);
-        }
-
-        .btn-apply {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.35);
-            margin-bottom: 10px;
-        }
+        .btn:active { transform: scale(0.96); }
+        .btn-apply { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(13, 110, 253, 0.35); margin-bottom: 10px; }
         .btn-apply:hover { background: var(--primary-dark); }
-
-        .btn-change {
-            background: var(--danger);
-            color: white;
-            box-shadow: 0 4px 12px rgba(253, 126, 20, 0.35);
-            margin-bottom: 10px;
-        }
+        .btn-change { background: var(--danger); color: white; box-shadow: 0 4px 12px rgba(253, 126, 20, 0.35); margin-bottom: 10px; }
         .btn-change:hover { background: var(--danger-dark); }
-
-        .range-error {
-            color: #d32f2f;
-            font-size: 0.9rem;
-            font-weight: 600;
-            min-height: 1.4em;
-            text-align: center;
-            margin: 8px 0;
-        }
+        .range-error { color: #d32f2f; font-size: 0.9rem; font-weight: 600; min-height: 1.4em; text-align: center; margin: 8px 0; }
 
         /* Overlay para el menú */
         #menuOverlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 400;
-            opacity: 0;
-            pointer-events: none;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5); z-index: 400; opacity: 0; pointer-events: none;
             transition: opacity 0.3s;
         }
-
-        #menuOverlay.visible {
-            opacity: 1;
-            pointer-events: auto;
-        }
+        #menuOverlay.visible { opacity: 1; pointer-events: auto; }
 
         /* Overlay de contraseña */
         #passwordOverlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1500;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-            backdrop-filter: blur(4px);
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8); display: flex; align-items: center; justify-content: center;
+            z-index: 1500; opacity: 0; pointer-events: none; transition: opacity 0.3s; backdrop-filter: blur(4px);
         }
-
-        #passwordOverlay.visible {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
+        #passwordOverlay.visible { opacity: 1; pointer-events: auto; }
         .password-card {
-            background: #ffffff;
-            padding: 2rem;
-            border-radius: 24px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
-            text-align: center;
-            max-width: 90%;
-            width: 360px;
-            animation: slideUp 0.3s ease;
+            background: #ffffff; padding: 2rem; border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25); text-align: center;
+            max-width: 90%; width: 360px; animation: slideUp 0.3s ease;
         }
-
-        .password-card h3 {
-            margin-bottom: 1rem;
-            font-size: 1.4rem;
-            color: #333;
-        }
-
+        .password-card h3 { margin-bottom: 1rem; font-size: 1.4rem; color: #333; }
         .password-card input {
-            width: 100%;
-            padding: 14px;
-            font-size: 1.2rem;
-            text-align: center;
-            border: 2px solid #e0e0e0;
-            border-radius: 14px;
-            outline: none;
-            margin-bottom: 1rem;
-            transition: border 0.3s;
-            background: #fafafa;
+            width: 100%; padding: 14px; font-size: 1.2rem; text-align: center;
+            border: 2px solid #e0e0e0; border-radius: 14px; outline: none; margin-bottom: 1rem;
+            transition: border 0.3s; background: #fafafa;
         }
-
-        .password-card input:focus {
-            border-color: var(--primary);
-        }
-
+        .password-card input:focus { border-color: var(--primary); }
         .password-card button {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            font-size: 1.1rem;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: 700;
-            width: 100%;
+            background: var(--primary); color: white; border: none; padding: 12px 30px;
+            font-size: 1.1rem; border-radius: 30px; cursor: pointer; font-weight: 700; width: 100%;
             transition: background 0.3s;
         }
-
-        .password-card button:hover {
-            background: var(--primary-dark);
-        }
-
-        .password-error {
-            color: #d32f2f;
-            font-weight: 600;
-            font-size: 0.9rem;
-            min-height: 1.2em;
-            margin-top: 8px;
-        }
+        .password-card button:hover { background: var(--primary-dark); }
+        .password-error { color: #d32f2f; font-weight: 600; font-size: 0.9rem; min-height: 1.2em; margin-top: 8px; }
 
         /* Overlay número gigante */
         #secretOverlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #0d1b2a;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.4s;
-            cursor: pointer;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #0d1b2a; display: flex; align-items: center; justify-content: center;
+            z-index: 2000; opacity: 0; pointer-events: none; transition: opacity 0.4s; cursor: pointer;
         }
-
-        #secretOverlay.visible {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
+        #secretOverlay.visible { opacity: 1; pointer-events: auto; }
         #secretNumberDisplay {
-            font-size: min(50vw, 16rem);
-            font-weight: 900;
-            color: #ffffff;
+            font-size: min(50vw, 16rem); font-weight: 900; color: #ffffff;
             text-shadow: 0 0 50px rgba(255, 215, 0, 0.9), 0 0 100px rgba(255, 215, 0, 0.7);
-            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            letter-spacing: 4px;
-            pointer-events: none;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); letter-spacing: 4px; pointer-events: none;
         }
-
         @keyframes popIn {
             0% { transform: scale(0.2); opacity: 0; }
             70% { transform: scale(1.15); opacity: 1; }
@@ -681,17 +263,14 @@
             #board { gap: 6px; padding: 2px; }
             .number-circle { font-size: 1.2rem; border-width: 2px; }
             #bottomBar { padding: 8px 10px; }
-            .secret-circle { width: 60px; height: 60px; font-size: 2.2rem; }
             .menu-btn { width: 40px; height: 40px; font-size: 1.5rem; }
             .range-group input { width: 50px; padding: 8px 5px; font-size: 1rem; }
             .btn { padding: 12px 16px; font-size: 1rem; min-height: 46px; }
         }
-
         @media (min-width: 1024px) {
             #board { max-width: 700px; }
             .number-circle { font-size: 1.8rem; }
             #bottomBar { padding: 12px 24px; }
-            .secret-circle { width: 80px; height: 80px; font-size: 3rem; }
         }
     </style>
 </head>
@@ -733,14 +312,9 @@
             <div id="board"></div>
         </div>
 
-        <!-- Barra inferior compacta -->
+        <!-- Barra inferior compacta: solo botón de menú -->
         <div id="bottomBar">
             <button class="menu-btn" id="menuBtn" title="Abrir controles">☰</button>
-            <div class="secret-section" id="secretSection">
-                <div class="secret-circle" id="secretCircle" title="Mostrar número secreto">?</div>
-                <span class="secret-label">Número secreto</span>
-                <span class="confirm-hint" id="confirmHint"></span>
-            </div>
         </div>
     </div>
 
@@ -787,14 +361,10 @@
             let currentRange = null;
             let numberStates = new Array(101).fill('none');
             let secretVisible = false;
-            let armed = false;
-            let tapCounter = 0;
-            let hideTapCounter = 0;
-            let tapTimer = null;
-            let hideTimer = null;
-            let lastTapTime = 0;
-            let doubleTapPending = false;
-            let doubleTapTimer = null;
+            let tapCounter = 0;       // Para revelar (4 toques)
+            let hideTapCounter = 0;   // Para ocultar (2 toques)
+            let tapTimer = null;      // Temporizador para reiniciar contador de revelar
+            let hideTimer = null;     // Temporizador para reiniciar contador de ocultar
             let passwordVerified = false;
 
             // DOM
@@ -808,15 +378,12 @@
             const initialPasswordInput = document.getElementById('initialPasswordInput');
 
             const mainContainer = document.getElementById('mainContainer');
-            const boardArea = document.getElementById('boardArea');
             const board = document.getElementById('board');
             const rangeFromInput = document.getElementById('rangeFrom');
             const rangeToInput = document.getElementById('rangeTo');
             const applyRangeBtn = document.getElementById('applyRangeBtn');
             const rangeError = document.getElementById('rangeError');
             const changeNumberBtn = document.getElementById('changeNumberBtn');
-            const secretCircle = document.getElementById('secretCircle');
-            const confirmHint = document.getElementById('confirmHint');
             const menuBtn = document.getElementById('menuBtn');
             const closeMenuBtn = document.getElementById('closeMenuBtn');
             const controlsMenu = document.getElementById('controlsMenu');
@@ -830,17 +397,15 @@
             const passwordOkBtn = document.getElementById('passwordOkBtn');
             const passwordError = document.getElementById('passwordError');
 
-            // Menú
+            // Funciones de menú
             function openMenu() {
                 controlsMenu.classList.add('visible');
                 menuOverlay.classList.add('visible');
             }
-
             function closeMenu() {
                 controlsMenu.classList.remove('visible');
                 menuOverlay.classList.remove('visible');
             }
-
             menuBtn.addEventListener('click', openMenu);
             closeMenuBtn.addEventListener('click', closeMenu);
             menuOverlay.addEventListener('click', closeMenu);
@@ -898,14 +463,10 @@
 
             function resetSecretState() {
                 secretVisible = false;
-                armed = false;
                 tapCounter = 0;
                 hideTapCounter = 0;
                 if (tapTimer) clearTimeout(tapTimer);
                 if (hideTimer) clearTimeout(hideTimer);
-                if (doubleTapTimer) clearTimeout(doubleTapTimer);
-                secretCircle.classList.remove('confirm-wait');
-                confirmHint.textContent = '';
                 secretOverlay.classList.remove('visible');
             }
 
@@ -931,51 +492,65 @@
                 refreshAllNumbers();
             }
 
-            function armDoubleFactor() {
+            // Función para manejar toques en el contenedor principal (revelar con 4 toques)
+            function handleMainTap(e) {
+                // Ignorar si el overlay secreto está visible o si es un elemento interactivo
                 if (secretVisible) return;
-                if (secretNumber === null) return;
+                if (e.target.closest('.number-circle') || 
+                    e.target.closest('.btn') || 
+                    e.target.closest('.menu-btn') || 
+                    e.target.closest('input') || 
+                    e.target.closest('#controlsMenu') || 
+                    e.target.closest('#menuOverlay') ||
+                    e.target.closest('#passwordOverlay')) {
+                    return;
+                }
 
+                // Si hay contraseña y no verificada, pedir contraseña
                 if (secretPassword && !passwordVerified) {
                     showPasswordOverlay();
                     return;
                 }
 
-                armed = true;
-                tapCounter = 0;
-                secretCircle.classList.add('confirm-wait');
-                confirmHint.textContent = 'Toca dos veces para revelar';
-                if (tapTimer) clearTimeout(tapTimer);
-                tapTimer = setTimeout(() => {
+                // Contar toques para revelar
+                tapCounter++;
+                if (tapCounter >= 4) {
                     resetSecretState();
-                }, 5000); // 5 segundos para completar la secuencia
-            }
-
-            function handleTapOnMain() {
-                if (secretVisible) return;
-
-                if (!armed) {
-                    armDoubleFactor();
+                    revealSecretNumber();
                 } else {
-                    tapCounter++;
-                    if (tapCounter >= 2) {
-                        revealSecretNumber();
-                    } else {
-                        confirmHint.textContent = 'Uno más...';
-                    }
+                    // Reiniciar temporizador
                     if (tapTimer) clearTimeout(tapTimer);
                     tapTimer = setTimeout(() => {
-                        resetSecretState();
-                    }, 5000);
+                        tapCounter = 0;
+                    }, 2000); // 2 segundos para completar la secuencia
                 }
             }
 
+            // Función para revelar el número
             function revealSecretNumber() {
-                resetSecretState(); // limpiar estado anterior
                 secretNumberDisplay.textContent = secretNumber;
                 secretOverlay.classList.add('visible');
                 secretVisible = true;
                 hideTapCounter = 0;
-                // El overlay se oculta con dos toques
+            }
+
+            // Función para ocultar el overlay con 2 toques
+            function handleOverlayTap() {
+                if (!secretVisible) return;
+                hideTapCounter++;
+                if (hideTapCounter >= 2) {
+                    resetSecretState();
+                    passwordVerified = false; // Reiniciar verificación por seguridad
+                } else {
+                    // Feedback visual
+                    secretNumberDisplay.style.animation = 'none';
+                    void secretNumberDisplay.offsetWidth;
+                    secretNumberDisplay.style.animation = 'popIn 0.5s';
+                }
+                if (hideTimer) clearTimeout(hideTimer);
+                hideTimer = setTimeout(() => {
+                    hideTapCounter = 0;
+                }, 1500); // 1.5 segundos para el segundo toque
             }
 
             function showPasswordOverlay() {
@@ -994,83 +569,15 @@
                 if (entered === secretPassword) {
                     passwordVerified = true;
                     hidePasswordOverlay();
-                    // Después de verificar, armamos el doble factor
-                    armDoubleFactor();
+                    // Después de verificar, reiniciamos contador y permitimos los 4 toques
+                    tapCounter = 0;
+                    if (tapTimer) clearTimeout(tapTimer);
                 } else {
                     passwordError.textContent = 'Contraseña incorrecta';
                     passwordInput.value = '';
                     passwordInput.focus();
                 }
             }
-
-            // Manejar clics en el contenedor principal para armar/revelar
-            mainContainer.addEventListener('click', (e) => {
-                // Ignorar clics en elementos interactivos
-                if (e.target.closest('.number-circle') || 
-                    e.target.closest('.btn') || 
-                    e.target.closest('.menu-btn') || 
-                    e.target.closest('input') || 
-                    e.target.closest('.secret-circle') ||
-                    e.target.closest('#controlsMenu') ||
-                    e.target.closest('#menuOverlay')) {
-                    return;
-                }
-                handleTapOnMain();
-            });
-
-            // Doble toque en cualquier parte del mainContainer
-            mainContainer.addEventListener('click', (e) => {
-                if (e.target.closest('.number-circle') || 
-                    e.target.closest('.btn') || 
-                    e.target.closest('.menu-btn') || 
-                    e.target.closest('input') || 
-                    e.target.closest('.secret-circle') ||
-                    e.target.closest('#controlsMenu') ||
-                    e.target.closest('#menuOverlay')) {
-                    return;
-                }
-
-                const now = Date.now();
-                if (now - lastTapTime < 300) {
-                    // Doble toque detectado
-                    if (doubleTapTimer) clearTimeout(doubleTapTimer);
-                    armDoubleFactor();
-                    lastTapTime = 0;
-                    return;
-                }
-                lastTapTime = now;
-                // Programar posible segundo toque
-                if (doubleTapTimer) clearTimeout(doubleTapTimer);
-                doubleTapTimer = setTimeout(() => {
-                    // No hubo doble toque, tratar como toque simple
-                    handleTapOnMain();
-                }, 300);
-            });
-
-            // Clic en el círculo secreto (toque simple)
-            secretCircle.addEventListener('click', (e) => {
-                e.stopPropagation();
-                handleTapOnMain();
-            });
-
-            // Ocultar overlay con dos toques
-            secretOverlay.addEventListener('click', () => {
-                if (!secretVisible) return;
-                hideTapCounter++;
-                if (hideTapCounter >= 2) {
-                    resetSecretState();
-                    passwordVerified = false; // Reiniciar verificación por seguridad
-                } else {
-                    // Mostrar indicador de que falta un toque
-                    secretNumberDisplay.style.animation = 'none';
-                    void secretNumberDisplay.offsetWidth;
-                    secretNumberDisplay.style.animation = 'popIn 0.5s';
-                }
-                if (hideTimer) clearTimeout(hideTimer);
-                hideTimer = setTimeout(() => {
-                    hideTapCounter = 0;
-                }, 3000);
-            });
 
             function showInitialScreen() {
                 resetSecretState();
@@ -1120,13 +627,13 @@
                 rangeFromInput.value = '';
                 rangeToInput.value = '';
                 rangeError.textContent = '';
-                confirmHint.textContent = '';
             }
 
             function init() {
                 generateBoard();
                 resetAllStates();
 
+                // Eventos
                 initialOkBtn.addEventListener('click', confirmInitialNumber);
                 initialInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') confirmInitialNumber(); });
                 initialPasswordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') confirmInitialNumber(); });
@@ -1147,10 +654,17 @@
 
                 passwordOkBtn.addEventListener('click', verifyPassword);
                 passwordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') verifyPassword(); });
-
                 passwordOverlay.addEventListener('click', (e) => {
                     if (e.target === passwordOverlay) hidePasswordOverlay();
                 });
+
+                // Detección de toques en el contenedor principal
+                mainContainer.addEventListener('click', (e) => {
+                    handleMainTap(e);
+                });
+
+                // Detección de toques en el overlay secreto para ocultar
+                secretOverlay.addEventListener('click', handleOverlayTap);
 
                 initialScreen.classList.remove('hidden');
                 mainContainer.classList.add('hidden');
