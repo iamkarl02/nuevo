@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Juego de Adivinar la Edad</title>
+    <style>
+        :root {
+            --highlight: #4caf50;
+            --discarded: #f44336;
+            --default-bg: #f0f0f0;
+            --default-border: #cccccc;
+            --secret-bg: #ffd700;
+            --secret-border: #b8860b;
+            --primary: #2196f3;
+            --primary-dark: #1976d2;
+            --danger: #ff5722;
+            --danger-dark: #e64a19;
+            --bg: #ffffff;
+            --controls-bg: #f9f9f9;
+            --text: #333;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* Pantalla inicial */
+        #initialScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        #initialScreen.hidden {
+            display: none;
+        }
+
+        .initial-card {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            max-width: 90%;
+            width: 400px;
+        }
+
+        .initial-card h2 {
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+            color: var(--primary-dark);
+        }
+
+        .initial-card p {
+            margin-bottom: 1.5rem;
+            color: #666;
+        }
+
+        .initial-card input {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 1.5rem;
+            text-align: center;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            outline: none;
+            transition: border 0.3s;
+        }
+
+        .initial-card input:focus {
+            border-color: var(--primary);
+        }
+
+        .initial-card button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            font-size: 1.5rem;
+            border-radius: 30px;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s, transform 0.1s;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .initial-card button:hover {
+            background: var(--primary-dark);
+        }
+
+        .initial-card button:active {
+            transform: scale(0.97);
+        }
+
+        /* Contenedor principal */
+        #mainContainer {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            opacity: 1;
+            transition: opacity 0.3s;
+        }
+
+        #mainContainer.hidden {
+            display: none;
+        }
+
+        /* Área del tablero */
+        #boardArea {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 12px;
+            background: #fafafa;
+        }
+
+        #board {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .number-circle {
+            aspect-ratio: 1 / 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: var(--default-bg);
+            border: 3px solid var(--default-border);
+            font-size: clamp(1rem, 4vw, 1.4rem);
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s, transform 0.1s, color 0.2s;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .number-circle:active {
+            transform: scale(0.92);
+        }
+
+        .number-circle.highlighted {
+            background: var(--highlight);
+            border-color: #2e7d32;
+            color: white;
+            box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
+        }
+
+        .number-circle.discarded {
+            background: var(--discarded);
+            border-color: #b71c1c;
+            color: white;
+            opacity: 0.75;
+            text-decoration: line-through;
+            box-shadow: 0 0 8px rgba(244, 67, 54, 0.3);
+        }
+
+        /* Área de controles */
+        #controlsArea {
+            background: var(--controls-bg);
+            border-top: 2px solid #e0e0e0;
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+            z-index: 10;
+        }
+
+        .range-controls {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .range-controls label {
+            font-weight: 600;
+            margin-right: 4px;
+            font-size: 1rem;
+        }
+
+        .range-controls input {
+            width: 70px;
+            padding: 8px 10px;
+            font-size: 1.2rem;
+            text-align: center;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            outline: none;
+            transition: border 0.3s;
+        }
+
+        .range-controls input:focus {
+            border-color: var(--primary);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.1s;
+            letter-spacing: 0.5px;
+            min-height: 48px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn:active {
+            transform: scale(0.96);
+        }
+
+        .btn-apply {
+            background: var(--primary);
+            color: white;
+            flex: 1;
+            max-width: 200px;
+        }
+
+        .btn-apply:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-change {
+            background: var(--danger);
+            color: white;
+            flex: 1;
+            max-width: 200px;
+        }
+
+        .btn-change:hover {
+            background: var(--danger-dark);
+        }
+
+        .secret-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .secret-circle {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: var(--secret-bg);
+            border: 4px solid var(--secret-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #5d4037;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        .secret-circle:active {
+            transform: scale(0.92);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .secret-label {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .range-error {
+            color: var(--danger);
+            font-size: 0.9rem;
+            font-weight: 600;
+            min-height: 1.2em;
+            text-align: center;
+        }
+
+        /* Overlay para mostrar el número secreto */
+        #secretOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        #secretOverlay.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        #secretNumberDisplay {
+            font-size: min(25vw, 12rem);
+            font-weight: 900;
+            color: white;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
+            animation: popIn 0.4s ease-out;
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0.3);
+                opacity: 0;
+            }
+            70% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            #board {
+                gap: 6px;
+                padding: 4px;
+            }
+
+            .number-circle {
+                font-size: 1rem;
+                border-width: 2px;
+            }
+
+            #controlsArea {
+                padding: 12px 10px;
+                gap: 10px;
+            }
+
+            .range-controls input {
+                width: 60px;
+                padding: 6px 8px;
+                font-size: 1rem;
+            }
+
+            .btn {
+                padding: 10px 16px;
+                font-size: 1rem;
+                min-height: 44px;
+            }
+
+            .secret-circle {
+                width: 60px;
+                height: 60px;
+                font-size: 2rem;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            #board {
+                max-width: 700px;
+            }
+
+            .number-circle {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Pantalla inicial para elegir número -->
+    <div id="initialScreen">
+        <div class="initial-card">
+            <h2>🎯 Adivina la Edad</h2>
+            <p>Elige un número secreto del 1 al 100</p>
+            <input type="number" id="initialNumberInput" min="1" max="100" placeholder="1-100" inputmode="numeric">
+            <button id="initialOkBtn">OK</button>
+            <p id="initialError" style="color: var(--danger); font-weight:600; margin-top:10px; min-height:1.2em;"></p>
+        </div>
+    </div>
+
+    <!-- Contenedor principal del juego -->
+    <div id="mainContainer" class="hidden">
+        <!-- Tablero de números -->
+        <div id="boardArea">
+            <div id="board"></div>
+        </div>
+
+        <!-- Controles -->
+        <div id="controlsArea">
+            <div class="range-controls">
+                <label for="rangeFrom">Desde:</label>
+                <input type="number" id="rangeFrom" min="1" max="100" placeholder="1" inputmode="numeric">
+                <label for="rangeTo">Hasta:</label>
+                <input type="number" id="rangeTo" min="1" max="100" placeholder="100" inputmode="numeric">
+                <button class="btn btn-apply" id="applyRangeBtn">Aplicar Rango</button>
+            </div>
+            <p class="range-error" id="rangeError"></p>
+            <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                <button class="btn btn-change" id="changeNumberBtn">Cambiar número</button>
+            </div>
+            <div class="secret-section">
+                <div class="secret-circle" id="secretCircle" title="Mostrar número secreto">?</div>
+                <span class="secret-label">Número secreto</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay para mostrar el número secreto gigante -->
+    <div id="secretOverlay">
+        <span id="secretNumberDisplay"></span>
+    </div>
+
+    <script>
+        (function() {
+            // Estado global
+            let secretNumber = null;
+            let currentRange = null; // {from, to}
+            let numberStates = new Array(101).fill('none'); // 'none', 'highlighted', 'discarded'
+            let secretRevealTimer = null;
+            let isSecretVisible = false;
+
+            // Referencias DOM
+            const initialScreen = document.getElementById('initialScreen');
+            const initialInput = document.getElementById('initialNumberInput');
+            const initialOkBtn = document.getElementById('initialOkBtn');
+            const initialError = document.getElementById('initialError');
+            const mainContainer = document.getElementById('mainContainer');
+            const board = document.getElementById('board');
+            const rangeFromInput = document.getElementById('rangeFrom');
+            const rangeToInput = document.getElementById('rangeTo');
+            const applyRangeBtn = document.getElementById('applyRangeBtn');
+            const rangeError = document.getElementById('rangeError');
+            const changeNumberBtn = document.getElementById('changeNumberBtn');
+            const secretCircle = document.getElementById('secretCircle');
+            const secretOverlay = document.getElementById('secretOverlay');
+            const secretNumberDisplay = document.getElementById('secretNumberDisplay');
+
+            // Generar tablero de números 1-100
+            function generateBoard() {
+                board.innerHTML = '';
+                for (let i = 1; i <= 100; i++) {
+                    const circle = document.createElement('div');
+                    circle.className = 'number-circle';
+                    circle.dataset.number = i;
+                    circle.textContent = i;
+                    circle.addEventListener('click', () => handleNumberClick(i));
+                    board.appendChild(circle);
+                }
+            }
+
+            // Actualizar clases CSS según el estado
+            function updateNumberElement(num) {
+                const element = board.querySelector(`[data-number="${num}"]`);
+                if (!element) return;
+                element.classList.remove('highlighted', 'discarded');
+                if (numberStates[num] === 'highlighted') {
+                    element.classList.add('highlighted');
+                } else if (numberStates[num] === 'discarded') {
+                    element.classList.add('discarded');
+                }
+            }
+
+            // Actualizar todos los números
+            function refreshAllNumbers() {
+                for (let i = 1; i <= 100; i++) {
+                    updateNumberElement(i);
+                }
+            }
+
+            // Resetear todos los estados
+            function resetAllStates() {
+                for (let i = 1; i <= 100; i++) {
+                    numberStates[i] = 'none';
+                }
+                refreshAllNumbers();
+                currentRange = null;
+                rangeFromInput.value = '';
+                rangeToInput.value = '';
+                rangeError.textContent = '';
+            }
+
+            // Manejar clic en un número
+            function handleNumberClick(num) {
+                if (numberStates[num] === 'highlighted') {
+                    numberStates[num] = 'discarded';
+                    updateNumberElement(num);
+                } else if (numberStates[num] === 'discarded') {
+                    numberStates[num] = 'highlighted';
+                    updateNumberElement(num);
+                }
+                // Si está 'none', no hacemos nada
+            }
+
+            // Validar y aplicar rango
+            function applyRange() {
+                const from = parseInt(rangeFromInput.value.trim(), 10);
+                const to = parseInt(rangeToInput.value.trim(), 10);
+
+                if (isNaN(from) || isNaN(to)) {
+                    rangeError.textContent = 'Por favor introduce ambos números.';
+                    return;
+                }
+                if (from < 1 || from > 100 || to < 1 || to > 100) {
+                    rangeError.textContent = 'Los números deben estar entre 1 y 100.';
+                    return;
+                }
+                if (from > to) {
+                    rangeError.textContent = 'El "Desde" debe ser menor o igual que "Hasta".';
+                    return;
+                }
+
+                // Limpiar error
+                rangeError.textContent = '';
+
+                // Resetear todos los estados
+                for (let i = 1; i <= 100; i++) {
+                    numberStates[i] = 'none';
+                }
+
+                // Marcar rango
+                for (let i = from; i <= to; i++) {
+                    numberStates[i] = 'highlighted';
+                }
+
+                currentRange = { from, to };
+                refreshAllNumbers();
+            }
+
+            // Mostrar número secreto gigante durante 5 segundos
+            function showSecretNumber() {
+                if (isSecretVisible || secretNumber === null) return;
+
+                secretNumberDisplay.textContent = secretNumber;
+                secretOverlay.classList.add('visible');
+                isSecretVisible = true;
+
+                // Ocultar después de exactamente 5 segundos
+                secretRevealTimer = setTimeout(() => {
+                    secretOverlay.classList.remove('visible');
+                    isSecretVisible = false;
+                    secretRevealTimer = null;
+                }, 5000);
+            }
+
+            // Mostrar pantalla inicial para elegir o cambiar número
+            function showInitialScreen() {
+                initialScreen.classList.remove('hidden');
+                initialInput.value = '';
+                initialError.textContent = '';
+                initialInput.focus();
+                // No ocultamos mainContainer aún, solo ponemos overlay encima
+            }
+
+            // Confirmar número desde pantalla inicial
+            function confirmInitialNumber() {
+                const value = parseInt(initialInput.value.trim(), 10);
+                if (isNaN(value) || value < 1 || value > 100) {
+                    initialError.textContent = 'Introduce un número válido entre 1 y 100.';
+                    return;
+                }
+
+                // Guardar número secreto
+                secretNumber = value;
+                initialError.textContent = '';
+
+                // Resetear estados del tablero si ya había partida
+                if (currentRange !== null || numberStates.some(s => s !== 'none')) {
+                    resetAllStates();
+                }
+
+                // Ocultar pantalla inicial y mostrar main
+                initialScreen.classList.add('hidden');
+                mainContainer.classList.remove('hidden');
+
+                // Limpiar inputs de rango
+                rangeFromInput.value = '';
+                rangeToInput.value = '';
+                rangeError.textContent = '';
+            }
+
+            // Inicializar
+            function init() {
+                generateBoard();
+                resetAllStates();
+
+                // Event listeners
+                initialOkBtn.addEventListener('click', confirmInitialNumber);
+                initialInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') confirmInitialNumber();
+                });
+
+                applyRangeBtn.addEventListener('click', applyRange);
+
+                changeNumberBtn.addEventListener('click', () => {
+                    showInitialScreen();
+                });
+
+                secretCircle.addEventListener('click', showSecretNumber);
+
+                // Permitir aplicar rango con Enter en inputs de rango
+                rangeFromInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') applyRange();
+                });
+                rangeToInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') applyRange();
+                });
+
+                // Mostrar pantalla inicial al cargar
+                initialScreen.classList.remove('hidden');
+                mainContainer.classList.add('hidden');
+                initialInput.focus();
+            }
+
+            init();
+        })();
+    </script>
+</body>
+</html>
