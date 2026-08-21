@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Semilla + ID Comprimido</title>
+</head>
+<body>
+    <!-- Primera pantalla: Solo semilla e ID -->
+    <div id="pantallaInicial">
+        <h1>Crear Mundo</h1>
+        
+        <label for="semillaInput">Semilla (obligatoria):</label>
+        <input type="text" id="semillaInput" placeholder="Escribe tu semilla">
+        
+        <br><br>
+        
+        <label for="idInput">ID corto (opcional, para unirse):</label>
+        <input type="text" id="idInput" placeholder="Pega el ID corto">
+        
+        <br><br>
+        
+        <button onclick="crearMundo()">Crear Mundo</button>
+        <button onclick="unirsePorID()">Unirse por ID</button>
+    </div>
+
+    <!-- Segunda pantalla: Cuadro de texto modificable -->
+    <div id="pantallaJuego" style="display:none;">
+        <h2>Mundo Creado</h2>
+        
+        <p>Semilla: <span id="semillaMostrada"></span></p>
+        <p>ID corto: <span id="idCorto"></span></p>
+        <p>ID expandido (interno): <span id="idExpandido"></span></p>
+        
+        <br>
+        
+        <label for="textoJuego">Texto del mundo (modifícalo):</label>
+        <br>
+        <textarea id="textoJuego" rows="10" cols="50"></textarea>
+        
+        <br><br>
+        
+        <button onclick="copiarIDCorto()">Copiar ID corto</button>
+        <button onclick="volverInicio()">Volver al inicio</button>
+        
+        <br><br>
+        
+        <details>
+            <summary>Ver sistema de compresión en cascada</summary>
+            <div id="detallesCompresion"></div>
+        </details>
+    </div>
+
+    <script>
+        // Sistema de compresión en cascada
+        class SistemaCompresion {
+            constructor() {
+                // Diccionario para la compresión en niveles
+                this.tablaCompresion = new Map();
+                this.contadorComprimidos = 0;
+            }
+
+            // Función hash simple
+            hashString(str) {
+                let hash = 0;
+                for (let i = 0; i < str.length; i++) {
+                    const char = str.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash = hash & hash;
+                }
+                return Math.abs(hash);
+            }
+
+            // Generar un ID corto aleatorio
+            generarIDCorto(longitud = 6) {
+                const caracteres = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                let resultado = '';
+                for (let i = 0; i < longitud; i++) {
+                    resultado += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+                }
+                return resultado;
+            }
+
+            // Comprimir texto largo en ID corto usando cascada
+            comprimirEnCascada(textoOriginal, niveles = 5) {
+                let textoActual = textoOriginal;
+                let historialCompresion = [];
+                
+                // Primera compresión: Base64
+                let comprimidoBase64 = btoa(unescape(encodeURIComponent(textoOriginal)));
+                historialCompresion.push({
+                    nivel: 1,
+                    tipo: 'Base64',
+                    entrada: textoOriginal,
+                    salida: comprimidoBase64,
+                    longitud: comprimidoBase64.length
+                });
+                
+                textoActual = comprimidoBase64;
+                
+                // Compresiones en cascada usando hash
+                for (let i = 0; i < niveles; i++) {
+                    const hashComprimido = this.hashString(textoActual).toString(36);
+                    const idCorto = this.generarIDCorto(6);
+                    
+                    // Crear mapeo: idCorto -> textoActual
+                    this.tablaCompresion.set(idCorto, textoActual);
+                    
+                    historialCompresion.push({
+                        nivel: i + 2,
+                        tipo: 'Hash + Corto',
+                        entrada: textoActual.substring(0, 50) + '...',
+                        salida: idCorto,
+                        longitud: idCorto.length
+                    });
+                    
+                    textoActual = idCorto;
+                }
+                
+                return {
+                    idFinal: textoActual,
+                    historial: historialCompresion
+                };
+            }
+
+            // Expandir ID corto usando la tabla de compresión
+            expandirIDCorto(idCorto) {
+                let textoActual = idCorto;
+                let historialExpansion = [];
+                let maxIteraciones = 10;
+                
+                while (this.tablaCompresion.has(textoActual) && maxIteraciones > 0) {
+                    const textoExpandido = this.tablaCompresion.get(textoActual);
+                    historialExpansion.push({
+                        desde: textoActual,
+                        hacia: textoExpandido.substring(0, 50) + '...'
+                    });
+                    textoActual = textoExpandido;
+                    maxIteraciones--;
+                }
+                
+                return {
+                    textoFinal: textoActual,
+                    historial: historialExpansion
+                };
+            }
+
+            // Simular compresión en cascada para visualización
+            simularCompresionCascada(textoOriginal) {
+                let niveles = [];
+                let textoActual = textoOriginal;
+                
+                // Nivel 1: Texto original
+                niveles.push({
+                    nivel: 0,
+                    descripcion: 'Texto original',
+                    valor: textoOriginal,
+                    longitud: textoOriginal.length
+                });
+                
+                // Nivel 2: Base64
+                const base64 = btoa(unescape(encodeURIComponent(textoOriginal)));
+                niveles.push({
+                    nivel: 1,
+                    descripcion: 'Base64',
+                    valor: base64,
+                    longitud: base64.length
+                });
+                
+                // Nivel 3: Hash comprimido
+                const hash1 = this.hashString(base64).toString(36);
+                niveles.push({
+                    nivel: 2,
+                    descripcion: 'Hash 1',
+                    valor: hash1,
+                    longitud: hash1.length
+                });
+                
+                // Nivel 4: Hash del hash
+                const hash2 = this.hashString(hash1).toString(36);
+                niveles.push({
+                    nivel: 3,
+                    descripcion: 'Hash 2',
+                    valor: hash2,
+                    longitud: hash2.length
+                });
+                
+                // Nivel 5: ID corto final
+                const idFinal = hash2.substring(0, 6);
+                niveles.push({
+                    nivel: 4,
+                    descripcion: 'ID corto final',
+                    valor: idFinal,
+                    longitud: idFinal.length
+                });
+                
+                return niveles;
+            }
+        }
+
+        // Variables globales
+        let semillaActual = '';
+        let textoActual = '';
+        let sistemaCompresion = new SistemaCompresion();
+        let mapaCompresionLocal = new Map();
+
+        // Generar texto desde semilla
+        function generarTextoDesdeSemilla(semilla) {
+            const palabrasBase = [
+                'manzana', 'perro', 'gato', 'casa', 'árbol', 
+                'sol', 'luna', 'estrella', 'mar', 'montaña',
+                'río', 'bosque', 'flor', 'fruta', 'verde',
+                'azul', 'rojo', 'amarillo', 'blanco', 'negro',
+                'fuego', 'agua', 'tierra', 'aire', 'espíritu',
+                'dragón', 'espada', 'escudo', 'magia', 'poder'
+            ];
+            
+            const hashSemilla = sistemaCompresion.hashString(semilla);
+            const numPalabras = 8 + (hashSemilla % 5);
+            let texto = '';
+            
+            for (let i = 0; i < numPalabras; i++) {
+                const index = (hashSemilla + i * 13) % palabrasBase.length;
+                texto += palabrasBase[index];
+                if (i < numPalabras - 1) {
+                    texto += ' ';
+                }
+            }
+            
+            return texto;
+        }
+
+        // Crear ID corto con compresión en cascada
+        function crearIDComprimido(semilla, texto) {
+            const datosCompletos = semilla + '|' + texto;
+            
+            // Simular compresión en cascada
+            const niveles = sistemaCompresion.simularCompresionCascada(datosCompletos);
+            const idCorto = niveles[niveles.length - 1].valor;
+            
+            // Guardar en mapa local (en realidad se necesitaría un servidor o localStorage)
+            mapaCompresionLocal.set(idCorto, datosCompletos);
+            
+            return {
+                idCorto: idCorto,
+                niveles: niveles,
+                datosCompletos: datosCompletos
+            };
+        }
+
+        // Expandir ID corto
+        function expandirIDComprimido(idCorto) {
+            if (mapaCompresionLocal.has(idCorto)) {
+                return mapaCompresionLocal.get(idCorto);
+            }
+            return null;
+        }
+
+        // Crear mundo nuevo
+        function crearMundo() {
+            const semilla = document.getElementById('semillaInput').value.trim();
+            
+            if (!semilla) {
+                alert('La semilla es obligatoria');
+                return;
+            }
+            
+            semillaActual = semilla;
+            textoActual = generarTextoDesdeSemilla(semilla);
+            
+            // Mostrar pantalla de juego
+            document.getElementById('pantallaInicial').style.display = 'none';
+            document.getElementById('pantallaJuego').style.display = 'block';
+            
+            // Actualizar información
+            document.getElementById('semillaMostrada').textContent = semillaActual;
+            document.getElementById('textoJuego').value = textoActual;
+            
+            // Generar ID comprimido
+            actualizarIDComprimido();
+        }
+
+        // Unirse por ID corto
+        function unirsePorID() {
+            const idCorto = document.getElementById('idInput').value.trim();
+            
+            if (!idCorto) {
+                alert('Por favor ingresa un ID');
+                return;
+            }
+            
+            const datosExpandidos = expandirIDComprimido(idCorto);
+            
+            if (datosExpandidos) {
+                const partes = datosExpandidos.split('|');
+                semillaActual = partes[0];
+                textoActual = partes.slice(1).join('|');
+                
+                // Mostrar pantalla de juego
+                document.getElementById('pantallaInicial').style.display = 'none';
+                document.getElementById('pantallaJuego').style.display = 'block';
+                
+                // Actualizar información
+                document.getElementById('semillaMostrada').textContent = semillaActual;
+                document.getElementById('textoJuego').value = textoActual;
+                document.getElementById('idCorto').textContent = idCorto;
+                document.getElementById('idExpandido').textContent = datosExpandidos;
+            } else {
+                alert('ID no encontrado en el sistema local');
+            }
+        }
+
+        // Actualizar ID cuando se modifica el texto
+        function actualizarIDComprimido() {
+            const nuevoTexto = document.getElementById('textoJuego').value;
+            textoActual = nuevoTexto;
+            
+            const resultado = crearIDComprimido(semillaActual, textoActual);
+            
+            document.getElementById('idCorto').textContent = resultado.idCorto;
+            document.getElementById('idExpandido').textContent = resultado.datosCompletos;
+            
+            // Mostrar detalles de compresión
+            mostrarDetallesCompresion(resultado.niveles);
+        }
+
+        // Mostrar detalles de la compresión en cascada
+        function mostrarDetallesCompresion(niveles) {
+            const detallesDiv = document.getElementById('detallesCompresion');
+            let html = '<table border="1" cellpadding="5">';
+            html += '<tr><th>Nivel</th><th>Descripción</th><th>Valor</th><th>Longitud</th></tr>';
+            
+            niveles.forEach(nivel => {
+                html += `<tr>
+                    <td>${nivel.nivel}</td>
+                    <td>${nivel.descripcion}</td>
+                    <td>${nivel.valor}</td>
+                    <td>${nivel.longitud} caracteres</td>
+                </tr>`;
+            });
+            
+            html += '</table>';
+            detallesDiv.innerHTML = html;
+        }
+
+        // Copiar ID corto
+        function copiarIDCorto() {
+            const idCorto = document.getElementById('idCorto').textContent;
+            
+            navigator.clipboard.writeText(idCorto).then(() => {
+                alert('ID corto copiado: ' + idCorto);
+            });
+        }
+
+        // Volver al inicio
+        function volverInicio() {
+            document.getElementById('pantallaJuego').style.display = 'none';
+            document.getElementById('pantallaInicial').style.display = 'block';
+            
+            // Limpiar campos
+            document.getElementById('semillaInput').value = '';
+            document.getElementById('idInput').value = '';
+        }
+
+        // Escuchar cambios en el textarea
+        document.getElementById('textoJuego').addEventListener('input', actualizarIDComprimido);
+    </script>
+</body>
+</html>
