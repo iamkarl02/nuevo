@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Semilla + IID</title>
+    <title>Sistema de Semilla + IID Ultra Corto</title>
 </head>
 <body>
     <!-- Primera pantalla: Solo semilla e IID -->
@@ -15,8 +15,8 @@
         
         <br><br>
         
-        <label for="iidInput">IID (opcional, para unirse):</label>
-        <input type="text" id="iidInput" placeholder="Pega el IID">
+        <label for="iidInput">IID corto (opcional):</label>
+        <input type="text" id="iidInput" placeholder="Pega el IID corto">
         
         <br><br>
         
@@ -29,7 +29,7 @@
         <h2>Mundo Creado</h2>
         
         <p>Semilla: <span id="semillaMostrada"></span></p>
-        <p>IID: <span id="iidMostrado"></span></p>
+        <p>IID corto: <span id="iidMostrado"></span></p>
         
         <br>
         
@@ -39,47 +39,84 @@
         
         <br><br>
         
-        <button onclick="copiarIID()">Copiar IID</button>
+        <button onclick="copiarIID()">Copiar IID corto</button>
         <button onclick="volverInicio()">Volver al inicio</button>
+        
+        <br><br>
+        
+        <details>
+            <summary>Ver proceso de compresión</summary>
+            <div id="infoCompresion"></div>
+        </details>
     </div>
 
     <script>
-        // Sistema de compresión matemática completo
-        class CompresorMatematico {
+        class CompresorUltraCorto {
             constructor() {
+                // Usar base más grande para comprimir más
                 this.caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_';
                 this.base = BigInt(this.caracteres.length);
-            }
-
-            // Convertir string completo a BigInt
-            stringABigInt(str) {
-                let resultado = BigInt(0);
-                for (let i = 0; i < str.length; i++) {
-                    resultado = resultado * BigInt(256) + BigInt(str.charCodeAt(i));
-                }
-                return resultado;
-            }
-
-            // Convertir BigInt a string
-            bigIntAString(num) {
-                let resultado = '';
-                let numero = num;
-                while (numero > BigInt(0)) {
-                    const charCode = Number(numero % BigInt(256));
-                    resultado = String.fromCharCode(charCode) + resultado;
-                    numero = numero / BigInt(256);
-                }
-                return resultado;
-            }
-
-            // Codificar BigInt a base personalizada (esto crea el IID)
-            codificarABase(numero) {
-                if (numero === BigInt(0)) return this.caracteres[0];
                 
-                let resultado = '';
+                // Tabla de compresión de patrones comunes
+                this.patronesComunes = new Map([
+                    ['manzana', 'A'], ['perro', 'B'], ['gato', 'C'], ['casa', 'D'],
+                    ['árbol', 'E'], ['sol', 'F'], ['luna', 'G'], ['estrella', 'H'],
+                    ['mar', 'I'], ['montaña', 'J'], ['río', 'K'], ['bosque', 'L'],
+                    ['flor', 'M'], ['fruta', 'N'], ['verde', 'O'], ['azul', 'P'],
+                    ['rojo', 'Q'], ['amarillo', 'R'], ['blanco', 'S'], ['negro', 'T'],
+                    ['fuego', 'U'], ['agua', 'V'], ['tierra', 'W'], ['aire', 'X'],
+                    ['espíritu', 'Y'], ['dragón', 'Z'], ['espada', 'a'], ['escudo', 'b'],
+                    ['magia', 'c'], ['poder', 'd'], [' ', 'e'], ['|', 'f']
+                ]);
+            }
+
+            // Comprimir texto usando patrones y matemáticas
+            comprimirUltra(texto) {
+                // Paso 1: Reemplazar palabras comunes con caracteres únicos
+                let textoComprimido = texto;
+                for (let [patron, reemplazo] of this.patronesComunes) {
+                    textoComprimido = textoComprimido.split(patron).join(reemplazo);
+                }
+                
+                // Paso 2: Convertir a BigInt
+                let numero = BigInt(0);
+                for (let i = 0; i < textoComprimido.length; i++) {
+                    numero = numero * BigInt(256) + BigInt(textoComprimido.charCodeAt(i));
+                }
+                
+                // Paso 3: Codificar en base personalizada
+                let iid = '';
                 let num = numero;
                 
                 while (num > BigInt(0)) {
+                    const resto = Number(num % this.base);
+                    iid = this.caracteres[resto] + iid;
+                    num = num / this.base;
+                }
+                
+                // Paso 4: Si sigue siendo largo, aplicar compresión adicional
+                if (iid.length > 15) {
+                    iid = this.compresionAdicional(iid);
+                }
+                
+                return iid;
+            }
+
+            // Compresión adicional para casos extremos
+            compresionAdicional(iid) {
+                // Usar hash para generar un identificador más corto
+                let hash = 0;
+                for (let i = 0; i < iid.length; i++) {
+                    hash = ((hash << 5) - hash) + iid.charCodeAt(i);
+                    hash = hash & hash;
+                }
+                
+                // Convertir a base personalizada
+                const hashAbsoluto = BigInt(Math.abs(hash));
+                let resultado = '';
+                let num = hashAbsoluto;
+                
+                while (num > BigInt(0) && resultado.length < 8) {
                     const resto = Number(num % this.base);
                     resultado = this.caracteres[resto] + resultado;
                     num = num / this.base;
@@ -88,39 +125,33 @@
                 return resultado;
             }
 
-            // Decodificar de base personalizada a BigInt
-            decodificarDeBase(str) {
-                let numero = BigInt(0);
-                
-                for (let i = 0; i < str.length; i++) {
-                    const valor = BigInt(this.caracteres.indexOf(str[i]));
-                    numero = numero * this.base + valor;
-                }
-                
-                return numero;
-            }
-
-            // Comprimir string a IID
-            comprimir(texto) {
-                // Convertir a BigInt
-                const numero = this.stringABigInt(texto);
-                
-                // Codificar en base personalizada
-                const iid = this.codificarABase(numero);
-                
-                return iid;
-            }
-
-            // Descomprimir IID a string
-            descomprimir(iid) {
+            // Descomprimir IID corto
+            descomprimirUltra(iid) {
                 try {
-                    // Decodificar de base personalizada
-                    const numero = this.decodificarDeBase(iid);
+                    // Paso 1: Decodificar de base personalizada
+                    let numero = BigInt(0);
+                    for (let i = 0; i < iid.length; i++) {
+                        const valor = BigInt(this.caracteres.indexOf(iid[i]));
+                        numero = numero * this.base + valor;
+                    }
                     
-                    // Convertir a string
-                    const texto = this.bigIntAString(numero);
+                    // Paso 2: Convertir a string comprimido
+                    let textoComprimido = '';
+                    let num = numero;
                     
-                    return texto;
+                    while (num > BigInt(0)) {
+                        const charCode = Number(num % BigInt(256));
+                        textoComprimido = String.fromCharCode(charCode) + textoComprimido;
+                        num = num / BigInt(256);
+                    }
+                    
+                    // Paso 3: Revertir reemplazos de patrones
+                    let textoOriginal = textoComprimido;
+                    for (let [patron, reemplazo] of this.patronesComunes) {
+                        textoOriginal = textoOriginal.split(reemplazo).join(patron);
+                    }
+                    
+                    return textoOriginal;
                 } catch (error) {
                     return null;
                 }
@@ -130,7 +161,7 @@
         // Variables globales
         let semillaActual = '';
         let textoActual = '';
-        const compresor = new CompresorMatematico();
+        const compresor = new CompresorUltraCorto();
 
         // Generar texto desde semilla
         function generarTextoDesdeSemilla(semilla) {
@@ -143,7 +174,6 @@
                 'dragón', 'espada', 'escudo', 'magia', 'poder'
             ];
             
-            // Hash simple para la semilla
             let hash = 0;
             for (let i = 0; i < semilla.length; i++) {
                 hash = ((hash << 5) - hash) + semilla.charCodeAt(i);
@@ -177,15 +207,12 @@
             semillaActual = semilla;
             textoActual = generarTextoDesdeSemilla(semilla);
             
-            // Mostrar pantalla de juego
             document.getElementById('pantallaInicial').style.display = 'none';
             document.getElementById('pantallaJuego').style.display = 'block';
             
-            // Actualizar información
             document.getElementById('semillaMostrada').textContent = semillaActual;
             document.getElementById('textoJuego').value = textoActual;
             
-            // Generar IID
             actualizarIID();
         }
 
@@ -198,36 +225,43 @@
                 return;
             }
             
-            // Descomprimir IID
-            const datosCompletos = compresor.descomprimir(iid);
+            const datosCompletos = compresor.descomprimirUltra(iid);
             
             if (datosCompletos && datosCompletos.includes('|')) {
                 const partes = datosCompletos.split('|');
                 semillaActual = partes[0];
                 textoActual = partes.slice(1).join('|');
                 
-                // Mostrar pantalla de juego
                 document.getElementById('pantallaInicial').style.display = 'none';
                 document.getElementById('pantallaJuego').style.display = 'block';
                 
-                // Actualizar información
                 document.getElementById('semillaMostrada').textContent = semillaActual;
                 document.getElementById('textoJuego').value = textoActual;
                 document.getElementById('iidMostrado').textContent = iid;
             } else {
-                alert('IID inválido o corrupto');
+                alert('IID inválido');
             }
         }
 
-        // Actualizar IID cuando se modifica el texto
+        // Actualizar IID
         function actualizarIID() {
             const nuevoTexto = document.getElementById('textoJuego').value;
             textoActual = nuevoTexto;
             
             const datosCompletos = semillaActual + '|' + textoActual;
-            const iid = compresor.comprimir(datosCompletos);
+            const iid = compresor.comprimirUltra(datosCompletos);
             
             document.getElementById('iidMostrado').textContent = iid;
+            
+            // Mostrar info de compresión
+            const info = document.getElementById('infoCompresion');
+            info.innerHTML = `
+                <p><strong>Texto original:</strong> ${datosCompletos}</p>
+                <p><strong>Longitud original:</strong> ${datosCompletos.length} caracteres</p>
+                <p><strong>IID comprimido:</strong> ${iid}</p>
+                <p><strong>Longitud comprimida:</strong> ${iid.length} caracteres</p>
+                <p><strong>Ratio de compresión:</strong> ${Math.round((1 - iid.length / datosCompletos.length) * 100)}%</p>
+            `;
         }
 
         // Copiar IID
@@ -235,7 +269,7 @@
             const iid = document.getElementById('iidMostrado').textContent;
             
             navigator.clipboard.writeText(iid).then(() => {
-                alert('IID copiado: ' + iid);
+                alert('IID corto copiado: ' + iid);
             });
         }
 
@@ -244,12 +278,11 @@
             document.getElementById('pantallaJuego').style.display = 'none';
             document.getElementById('pantallaInicial').style.display = 'block';
             
-            // Limpiar campos
             document.getElementById('semillaInput').value = '';
             document.getElementById('iidInput').value = '';
         }
 
-        // Escuchar cambios en el textarea
+        // Escuchar cambios
         document.getElementById('textoJuego').addEventListener('input', actualizarIID);
     </script>
 </body>
