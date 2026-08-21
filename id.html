@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Semilla + ID</title>
+    <title>Sistema de Semilla + IID</title>
 </head>
 <body>
-    <!-- Primera pantalla: Solo semilla e ID -->
+    <!-- Primera pantalla: Solo semilla e IID -->
     <div id="pantallaInicial">
         <h1>Crear Mundo</h1>
         
@@ -15,8 +15,8 @@
         
         <br><br>
         
-        <label for="idInput">IID (opcional, para unirse):</label>
-        <input type="text" id="idInput" placeholder="Pega el IID corto">
+        <label for="iidInput">IID (opcional, para unirse):</label>
+        <input type="text" id="iidInput" placeholder="Pega el IID">
         
         <br><br>
         
@@ -44,157 +44,83 @@
     </div>
 
     <script>
-        // Sistema matemático de compresión/expansión
-        class SistemaMatematico {
+        // Sistema de compresión matemática completo
+        class CompresorMatematico {
             constructor() {
-                // Base de caracteres para codificación
-                this.baseCaracteres = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_';
-                this.base = this.baseCaracteres.length;
+                this.caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_';
+                this.base = BigInt(this.caracteres.length);
             }
 
-            // Convertir string a número grande
-            stringANumero(str) {
-                let numero = BigInt(0);
+            // Convertir string completo a BigInt
+            stringABigInt(str) {
+                let resultado = BigInt(0);
                 for (let i = 0; i < str.length; i++) {
-                    numero = numero * BigInt(256) + BigInt(str.charCodeAt(i));
+                    resultado = resultado * BigInt(256) + BigInt(str.charCodeAt(i));
                 }
-                return numero;
+                return resultado;
             }
 
-            // Convertir número a string
-            numeroAString(numero) {
-                let str = '';
-                let num = numero;
-                while (num > 0) {
-                    const resto = Number(num % BigInt(256));
-                    str = String.fromCharCode(resto) + str;
-                    num = num / BigInt(256);
+            // Convertir BigInt a string
+            bigIntAString(num) {
+                let resultado = '';
+                let numero = num;
+                while (numero > BigInt(0)) {
+                    const charCode = Number(numero % BigInt(256));
+                    resultado = String.fromCharCode(charCode) + resultado;
+                    numero = numero / BigInt(256);
                 }
-                return str;
+                return resultado;
             }
 
-            // Codificar número en base personalizada
-            codificarBase(numero) {
-                if (numero === BigInt(0)) return this.baseCaracteres[0];
+            // Codificar BigInt a base personalizada (esto crea el IID)
+            codificarABase(numero) {
+                if (numero === BigInt(0)) return this.caracteres[0];
                 
                 let resultado = '';
                 let num = numero;
                 
-                while (num > 0) {
-                    const resto = Number(num % BigInt(this.base));
-                    resultado = this.baseCaracteres[resto] + resultado;
-                    num = num / BigInt(this.base);
+                while (num > BigInt(0)) {
+                    const resto = Number(num % this.base);
+                    resultado = this.caracteres[resto] + resultado;
+                    num = num / this.base;
                 }
                 
                 return resultado;
             }
 
-            // Decodificar base personalizada a número
-            decodificarBase(str) {
+            // Decodificar de base personalizada a BigInt
+            decodificarDeBase(str) {
                 let numero = BigInt(0);
                 
                 for (let i = 0; i < str.length; i++) {
-                    const valor = this.baseCaracteres.indexOf(str[i]);
-                    numero = numero * BigInt(this.base) + BigInt(valor);
+                    const valor = BigInt(this.caracteres.indexOf(str[i]));
+                    numero = numero * this.base + valor;
                 }
                 
                 return numero;
             }
 
-            // Función hash reversible matemática
-            hashMatematico(numero) {
-                // Usar operaciones matemáticas reversibles
-                const primoGrande = BigInt(9999999967);
-                const primoPequeno = BigInt(9999999991);
+            // Comprimir string a IID
+            comprimir(texto) {
+                // Convertir a BigInt
+                const numero = this.stringABigInt(texto);
                 
-                // Transformación matemática
-                let hash = (numero * primoGrande) % primoPequeno;
-                
-                // Aplicar operaciones XOR reversibles
-                hash = hash ^ (hash >> BigInt(12));
-                hash = hash ^ (hash << BigInt(25));
-                hash = hash ^ (hash >> BigInt(27));
-                
-                return hash;
-            }
-
-            // Función hash inversa (para expandir)
-            hashInverso(numero) {
-                // Revertir XOR (XOR es su propia inversa)
-                let hash = numero;
-                hash = hash ^ (hash >> BigInt(27));
-                hash = hash ^ (hash << BigInt(25));
-                hash = hash ^ (hash >> BigInt(12));
-                
-                // Revertir multiplicación modular
-                const primoGrande = BigInt(9999999967);
-                const primoPequeno = BigInt(9999999991);
-                
-                // Encontrar inverso modular
-                const inverso = this.inversoModular(primoGrande, primoPequeno);
-                hash = (hash * inverso) % primoPequeno;
-                
-                return hash;
-            }
-
-            // Calcular inverso modular
-            inversoModular(a, m) {
-                let m0 = m;
-                let y = BigInt(0);
-                let x = BigInt(1);
-                
-                if (m === BigInt(1)) return BigInt(0);
-                
-                while (a > 1) {
-                    const q = a / m;
-                    let t = m;
-                    m = a % m;
-                    a = t;
-                    t = y;
-                    y = x - q * y;
-                    x = t;
-                }
-                
-                if (x < 0) x += m0;
-                return x;
-            }
-
-            // Comprimir datos a IID corto
-            comprimirAIID(datos) {
-                // Paso 1: Convertir string a número
-                const numeroOriginal = this.stringANumero(datos);
-                
-                // Paso 2: Aplicar hash matemático
-                const numeroHash = this.hashMatematico(numeroOriginal);
-                
-                // Paso 3: Codificar en base personalizada
-                const iid = this.codificarBase(numeroHash);
-                
-                // Paso 4: Si es muy largo, truncar con sistema de reconstrucción
-                if (iid.length > 8) {
-                    // Guardar información de reconstrucción en los primeros caracteres
-                    const longitudOriginal = datos.length;
-                    const infoLongitud = this.codificarBase(BigInt(longitudOriginal));
-                    const iidFinal = iid.substring(0, 6) + infoLongitud.substring(0, 2);
-                    return iidFinal;
-                }
+                // Codificar en base personalizada
+                const iid = this.codificarABase(numero);
                 
                 return iid;
             }
 
-            // Expandir IID a datos originales
-            expandirIID(iid) {
+            // Descomprimir IID a string
+            descomprimir(iid) {
                 try {
-                    // Paso 1: Decodificar de base personalizada
-                    const numeroHash = this.decodificarBase(iid);
+                    // Decodificar de base personalizada
+                    const numero = this.decodificarDeBase(iid);
                     
-                    // Paso 2: Aplicar hash inverso
-                    const numeroOriginal = this.hashInverso(numeroHash);
+                    // Convertir a string
+                    const texto = this.bigIntAString(numero);
                     
-                    // Paso 3: Convertir número a string
-                    const datos = this.numeroAString(numeroOriginal);
-                    
-                    return datos;
+                    return texto;
                 } catch (error) {
                     return null;
                 }
@@ -204,7 +130,7 @@
         // Variables globales
         let semillaActual = '';
         let textoActual = '';
-        let sistemaMatematico = new SistemaMatematico();
+        const compresor = new CompresorMatematico();
 
         // Generar texto desde semilla
         function generarTextoDesdeSemilla(semilla) {
@@ -217,12 +143,19 @@
                 'dragón', 'espada', 'escudo', 'magia', 'poder'
             ];
             
-            const hash = BigInt(this.hashString(semilla));
-            const numPalabras = 8 + Number(hash % BigInt(5));
+            // Hash simple para la semilla
+            let hash = 0;
+            for (let i = 0; i < semilla.length; i++) {
+                hash = ((hash << 5) - hash) + semilla.charCodeAt(i);
+                hash = hash & hash;
+            }
+            hash = Math.abs(hash);
+            
+            const numPalabras = 8 + (hash % 5);
             let texto = '';
             
             for (let i = 0; i < numPalabras; i++) {
-                const index = Number((hash + BigInt(i * 13)) % BigInt(palabrasBase.length));
+                const index = (hash + i * 13) % palabrasBase.length;
                 texto += palabrasBase[index];
                 if (i < numPalabras - 1) {
                     texto += ' ';
@@ -230,17 +163,6 @@
             }
             
             return texto;
-        }
-
-        // Hash simple para semilla
-        function hashString(str) {
-            let hash = 0;
-            for (let i = 0; i < str.length; i++) {
-                const char = str.charCodeAt(i);
-                hash = ((hash << 5) - hash) + char;
-                hash = hash & hash;
-            }
-            return Math.abs(hash);
         }
 
         // Crear mundo nuevo
@@ -269,17 +191,18 @@
 
         // Unirse por IID
         function unirsePorIID() {
-            const iid = document.getElementById('idInput').value.trim();
+            const iid = document.getElementById('iidInput').value.trim();
             
             if (!iid) {
                 alert('Por favor ingresa un IID');
                 return;
             }
             
-            const datosExpandidos = sistemaMatematico.expandirIID(iid);
+            // Descomprimir IID
+            const datosCompletos = compresor.descomprimir(iid);
             
-            if (datosExpandidos && datosExpandidos.includes('|')) {
-                const partes = datosExpandidos.split('|');
+            if (datosCompletos && datosCompletos.includes('|')) {
+                const partes = datosCompletos.split('|');
                 semillaActual = partes[0];
                 textoActual = partes.slice(1).join('|');
                 
@@ -292,7 +215,7 @@
                 document.getElementById('textoJuego').value = textoActual;
                 document.getElementById('iidMostrado').textContent = iid;
             } else {
-                alert('IID inválido');
+                alert('IID inválido o corrupto');
             }
         }
 
@@ -302,7 +225,7 @@
             textoActual = nuevoTexto;
             
             const datosCompletos = semillaActual + '|' + textoActual;
-            const iid = sistemaMatematico.comprimirAIID(datosCompletos);
+            const iid = compresor.comprimir(datosCompletos);
             
             document.getElementById('iidMostrado').textContent = iid;
         }
@@ -323,7 +246,7 @@
             
             // Limpiar campos
             document.getElementById('semillaInput').value = '';
-            document.getElementById('idInput').value = '';
+            document.getElementById('iidInput').value = '';
         }
 
         // Escuchar cambios en el textarea
