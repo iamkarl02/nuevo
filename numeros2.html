@@ -566,6 +566,50 @@
         .names-modal-card .title { font-size: 1.2rem; font-weight: 700; text-align: center; color: var(--accent); }
         .name-row { display: flex; align-items: center; gap: 10px; }
         .name-row .input { flex: 1; }
+
+        /* Nuevos estilos para la vista previa de seed */
+        .seed-preview {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            font-size: 0.85rem;
+            color: var(--text);
+            max-height: 200px;
+            overflow-y: auto;
+            word-break: break-word;
+            display: none; /* oculto por defecto */
+        }
+        .seed-preview.visible { display: block; }
+        .seed-preview .preview-title {
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #c4b5fd;
+            font-size: 0.9rem;
+        }
+        .seed-preview .preview-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+            gap: 10px;
+        }
+        .seed-preview .preview-row span:first-child {
+            color: var(--text2);
+        }
+        .seed-preview .preview-error {
+            color: var(--red);
+            font-weight: 600;
+        }
+        .seed-preview .preview-names {
+            margin-top: 6px;
+        }
+        .seed-preview .preview-name-item {
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+            padding: 4px 8px;
+            margin: 2px 0;
+        }
+
         @media (min-width: 768px) {
             .numbers-grid { grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)); }
             .home-container { max-width: 520px; }
@@ -709,6 +753,8 @@
         <div class="seed-input-card">
             <div class="title">🔑 INTRODUCE LA SEED</div>
             <input type="text" class="input" id="seed-input-field" placeholder="Ej: 1234567890" autocomplete="off" spellcheck="false">
+            <!-- Vista previa de la seed -->
+            <div id="seed-preview" class="seed-preview"></div>
             <button class="btn btn-primary btn-lg btn-full" id="btn-seed-continue">CONTINUAR</button>
             <button class="btn btn-secondary btn-sm btn-full" id="btn-seed-cancel">CANCELAR</button>
         </div>
@@ -964,6 +1010,7 @@
             function showSeedInputOverlay() {
                 document.getElementById('seed-input-overlay').style.display = 'flex';
                 document.getElementById('seed-input-field').value = '';
+                updateSeedPreview(); // limpiar vista previa
                 document.getElementById('seed-input-field').focus();
             }
             function hideSeedInputOverlay() {
@@ -1000,6 +1047,46 @@
                     input.value = text; document.body.appendChild(input);
                     input.select(); document.execCommand('copy'); document.body.removeChild(input);
                     showToast('✅ Seed copiada: ' + text);
+                }
+            }
+
+            // ===================== NUEVA FUNCIÓN: actualizar vista previa de seed =====================
+            function updateSeedPreview() {
+                const input = document.getElementById('seed-input-field');
+                const preview = document.getElementById('seed-preview');
+                const continueBtn = document.getElementById('btn-seed-continue');
+                const val = input.value.trim();
+
+                if (!val) {
+                    preview.innerHTML = '';
+                    preview.classList.remove('visible');
+                    continueBtn.disabled = true;
+                    return;
+                }
+
+                try {
+                    const parsed = parseSeed(val);
+                    let html = '<div class="preview-title">INFORMACIÓN DE LA SEED</div>';
+                    html += `<div class="preview-row"><span>Límite de números:</span><span>${parsed.limit}</span></div>`;
+                    html += `<div class="preview-row"><span>Número de jugadores:</span><span>${parsed.players}</span></div>`;
+                    html += `<div class="preview-row"><span>Números deshabilitados:</span><span>${parsed.disableNumbers ? 'Sí' : 'No'}</span></div>`;
+                    html += `<div class="preview-row"><span>Notas deshabilitadas:</span><span>${parsed.disableNotes ? 'Sí' : 'No'}</span></div>`;
+                    if (parsed.names && parsed.names.length > 0) {
+                        html += '<div class="preview-names"><strong>Nombres:</strong>';
+                        parsed.names.forEach((name, i) => {
+                            html += `<div class="preview-name-item">Jugador ${i+1}: ${name}</div>`;
+                        });
+                        html += '</div>';
+                    } else {
+                        html += '<div class="preview-row"><span>Nombres incluidos:</span><span>No</span></div>';
+                    }
+                    preview.innerHTML = html;
+                    preview.classList.add('visible');
+                    continueBtn.disabled = false;
+                } catch (e) {
+                    preview.innerHTML = `<div class="preview-error">❌ Seed inválida: ${e.message}</div>`;
+                    preview.classList.add('visible');
+                    continueBtn.disabled = true;
                 }
             }
 
@@ -1350,9 +1437,18 @@
                 });
 
                 // Seed input overlay
+                document.getElementById('seed-input-field').addEventListener('input', updateSeedPreview);
+
                 document.getElementById('btn-seed-continue').addEventListener('click', () => {
                     const val = document.getElementById('seed-input-field').value.trim();
                     if (!val) { showMessage('Introduce una seed', true, 1500); return; }
+                    try {
+                        parseSeed(val);
+                    } catch (e) {
+                        showMessage('❌ Seed inválida', true, 1500);
+                        updateSeedPreview();
+                        return;
+                    }
                     hideSeedInputOverlay();
                     loadSeedAndStart(val);
                 });
