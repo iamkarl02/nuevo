@@ -15,7 +15,6 @@
             --accent2: #5a4bd0;
             --green: #4ade80;
             --red: #f87171;
-            --gold: #fbbf24;
             --radius: 14px;
             --radius-sm: 8px;
             --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
@@ -43,10 +42,6 @@
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(18px); }
             to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
         }
         @keyframes pop {
             0% { transform: scale(0.6); opacity: 0; }
@@ -135,13 +130,6 @@
             letter-spacing: 0.08em;
             color: var(--text2);
             margin-bottom: 6px;
-        }
-        .card {
-            background: var(--surface);
-            border-radius: var(--radius);
-            padding: 20px;
-            border: 1px solid rgba(255,255,255,0.06);
-            box-shadow: var(--shadow);
         }
         .home-container {
             flex: 1;
@@ -261,6 +249,7 @@
         .range-bar input { width: 70px; padding: 8px 10px; font-size: 0.9rem; font-weight: 700; text-align: center; border: 2px solid rgba(255,255,255,0.1); border-radius: 6px; background: var(--surface); color: var(--text); outline: none; user-select: text; -webkit-user-select: text; }
         .range-bar input:focus { border-color: var(--accent); }
         .range-bar .btn { padding: 8px 14px; font-size: 0.8rem; border-radius: 6px; white-space: nowrap; }
+        .limit-indicator { font-size: 0.7rem; color: var(--text2); margin-left: auto; }
         .numbers-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; background: rgba(0,0,0,0.35); border-radius: var(--radius-sm); padding: 10px; min-height: 0; }
         .numbers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)); gap: 6px; padding-bottom: 8px; }
         .num-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: var(--transition); background: rgba(255,255,255,0.06); color: var(--text2); border: 1px solid rgba(255,255,255,0.06); touch-action: manipulation; min-height: 40px; }
@@ -445,27 +434,26 @@
 </head>
 <body>
 
-    <!-- VISTA: HOME -->
+    <!-- VISTA: HOME (sin botón de configuración) -->
     <div id="view-home" class="view active">
         <div class="home-container">
             <div class="home-title">🎲 JUEGO DE NÚMEROS</div>
             <div class="home-subtitle">Una partida compartida mediante una <strong>SEED determinista</strong>. Todos los jugadores con la misma seed ven exactamente la misma partida.</div>
             <div class="home-buttons">
                 <button class="btn btn-primary btn-xl btn-full" id="btn-generate-home">⚡ INICIAR Y GENERAR SEED</button>
-                <button class="btn btn-secondary btn-lg btn-full" id="btn-config-home">⚙️ CONFIGURACIÓN</button>
                 <button class="btn btn-outline btn-lg btn-full" id="btn-add-seed-home">🔑 AGREGAR SEED</button>
             </div>
         </div>
     </div>
 
-    <!-- VISTA: CONFIG -->
+    <!-- VISTA: CONFIG (accesible solo tras pulsar INICIAR) -->
     <div id="view-config" class="view">
         <button class="back-btn" id="btn-back-config">←</button>
         <div class="config-container">
             <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:16px;text-align:center;">⚙️ CONFIGURACIÓN</h2>
             <div class="config-grid">
                 <div class="config-row">
-                    <span class="label">🔢 Límite de Números</span>
+                    <span class="label">🔢 Límite de Números (máx 46656)</span>
                     <input type="number" class="input" id="cfg-limit" value="100" min="1" max="46656" placeholder="Ej: 100">
                 </div>
                 <div class="config-row">
@@ -513,11 +501,12 @@
                 <div class="game-content">
                     <div class="numbers-area" id="numbers-area">
                         <div class="range-bar" id="range-bar">
-                            <span class="label">RANGO</span>
-                            <input type="number" id="range-x" placeholder="X" min="1">
+                            <span class="label">RANGO ENTRE</span>
+                            <input type="number" id="range-x" placeholder="X" min="1" inputmode="numeric">
                             <span style="color:var(--text2);font-weight:600;">Y</span>
-                            <input type="number" id="range-y" placeholder="Y" min="1">
+                            <input type="number" id="range-y" placeholder="Y" min="1" inputmode="numeric">
                             <button class="btn btn-secondary btn-sm" id="btn-apply-range">APLICAR</button>
+                            <span class="limit-indicator" id="limit-indicator"></span>
                         </div>
                         <div class="numbers-scroll" id="numbers-scroll">
                             <div class="numbers-grid" id="numbers-grid"></div>
@@ -607,19 +596,15 @@
             }
             function base36ToDecimal(base36Str) { return parseInt(base36Str, 36).toString(); }
 
-            // ===================== GENERACIÓN DE COLORES ÚNICOS Y VARIADOS =====================
-            // Generar una paleta amplia de 720 colores HSL variados (hue de 0 a 359, dos niveles de luminosidad)
+            // ===================== GENERACIÓN DE COLORES ÚNICOS =====================
             function generateColorPalette() {
                 const colors = [];
                 for (let h = 0; h < 360; h++) {
-                    // Variante 1: saturación 70%, luminosidad 60%
                     colors.push(hslToHex(h, 70, 60));
-                    // Variante 2: saturación 80%, luminosidad 45%
                     colors.push(hslToHex(h, 80, 45));
                 }
                 return colors;
             }
-
             function hslToHex(h, s, l) {
                 h = h % 360;
                 s = Math.min(100, Math.max(0, s)) / 100;
@@ -637,8 +622,7 @@
                 const toHex = (val) => Math.round((val + m) * 255).toString(16).padStart(2, '0');
                 return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
             }
-
-            const COLOR_PALETTE = generateColorPalette(); // 720 colores únicos
+            const COLOR_PALETTE = generateColorPalette();
 
             function getShuffledColors(seedDecimalStr) {
                 const arr = [...COLOR_PALETTE];
@@ -649,10 +633,8 @@
                 }
                 return arr;
             }
-
             function getPlayerColorHex(seedDecimalStr, playerIndex) {
                 const shuffled = getShuffledColors(seedDecimalStr);
-                // Usar módulo para evitar repetición si hay más de 720 jugadores (improbable)
                 return shuffled[playerIndex % shuffled.length];
             }
 
@@ -777,6 +759,7 @@
                 document.getElementById('game-seed-text').textContent = seed;
                 document.getElementById('game-player-label').textContent = 'JUGADOR ' + (playerIndex + 1);
                 document.getElementById('checker-bg').style.setProperty('--player-color', playerColor);
+                document.getElementById('limit-indicator').textContent = 'Límite: ' + gameState.limit;
                 renderPlayersBar();
                 renderNumbersGrid();
                 updateNumbersVisibility();
@@ -818,6 +801,7 @@
                     cell.textContent = n;
                     cell.dataset.number = n;
                     const state = numberStates[n] || 'none';
+                    cell.classList.remove('state-none', 'state-green', 'state-red');
                     cell.classList.add('state-' + state);
                     cell.addEventListener('click', () => cycleNumberState(n));
                     cell.addEventListener('touchend', (e) => { e.preventDefault(); cycleNumberState(n); });
@@ -838,26 +822,39 @@
                 }
             }
 
+            // ===================== LÓGICA DE ESTADOS DE NÚMEROS =====================
+            // Ciclo: SIN COLOR -> VERDE -> ROJO -> SIN COLOR
             function cycleNumberState(n) {
                 const current = numberStates[n] || 'none';
-                if (current === 'none') numberStates[n] = 'green';
-                else if (current === 'green') numberStates[n] = 'red';
-                else delete numberStates[n];
+                if (current === 'none') {
+                    numberStates[n] = 'green';
+                } else if (current === 'green') {
+                    numberStates[n] = 'red';
+                } else {
+                    delete numberStates[n];
+                }
                 renderNumbersGrid();
             }
 
             function applyRange(x, y) {
-                if (!gameState || gameState.disableNumbers) return;
+                if (!gameState || gameState.disableNumbers) {
+                    showMessage('Los números están deshabilitados.', true);
+                    return;
+                }
                 const xNum = parseInt(x);
                 const yNum = parseInt(y);
                 if (isNaN(xNum) || isNaN(yNum) || xNum < 1 || yNum < xNum || yNum > gameState.limit) {
                     showMessage('Rango inválido. Verifica los valores.', true);
                     return;
                 }
+                // Paso 1: borrar todos los estados
                 numberStates = {};
-                for (let n = xNum; n <= yNum; n++) numberStates[n] = 'green';
+                // Paso 2: marcar rango en verde
+                for (let n = xNum; n <= yNum; n++) {
+                    numberStates[n] = 'green';
+                }
                 renderNumbersGrid();
-                showMessage('Rango ' + xNum + '–' + yNum + ' aplicado ✓', false, 1200);
+                showMessage(`Rango ${xNum}–${yNum} aplicado ✓`, false, 1500);
             }
 
             // ===================== TAP EN CÍRCULOS =====================
@@ -952,9 +949,8 @@
 
             // ===================== EVENTOS =====================
             document.addEventListener('DOMContentLoaded', () => {
-                // Home
+                // Home (sin botón de configuración)
                 document.getElementById('btn-generate-home').addEventListener('click', goConfig);
-                document.getElementById('btn-config-home').addEventListener('click', goConfig);
                 document.getElementById('btn-add-seed-home').addEventListener('click', showSeedInputOverlay);
 
                 // Config
