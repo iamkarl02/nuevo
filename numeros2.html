@@ -49,16 +49,25 @@
             70% { transform: scale(1.08); }
             100% { transform: scale(1); opacity: 1; }
         }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
         @keyframes glow {
             0%, 100% { box-shadow: 0 0 20px rgba(124,107,240,0.4); }
             50% { box-shadow: 0 0 40px rgba(124,107,240,0.7); }
+        }
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
         }
         .view {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             display: none;
             flex-direction: column;
-            animation: fadeIn 0.35s ease-out;
+            animation: fadeIn 0.3s ease-out;
             z-index: 1;
             overflow: hidden;
         }
@@ -80,6 +89,7 @@
             position: relative;
             overflow: hidden;
             white-space: nowrap;
+            will-change: transform, box-shadow;
         }
         .btn:active { transform: scale(0.96); }
         .btn-primary {
@@ -202,14 +212,17 @@
             cursor: pointer;
             transition: var(--transition);
             touch-action: manipulation;
+            will-change: transform, border-color, background;
         }
-        .player-select-btn:active { transform: scale(0.93); border-color: var(--accent); }
+        .player-select-btn:active { transform: scale(0.93); border-color: var(--accent); background: rgba(124,107,240,0.1); }
         .player-select-btn .dot {
             width: 40px; height: 40px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             font-weight: 700; font-size: 1.1rem; color: #000;
             box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            transition: transform 0.2s ease;
         }
+        .player-select-btn:hover .dot { transform: scale(1.1); }
         .game-container { flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; }
         .game-topbar {
             display: flex; align-items: center; justify-content: space-between;
@@ -253,10 +266,26 @@
         .limit-indicator { font-size: 0.7rem; color: var(--text2); margin-left: auto; }
         .numbers-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; background: rgba(0,0,0,0.35); border-radius: var(--radius-sm); padding: 10px; min-height: 0; }
         .numbers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)); gap: 6px; padding-bottom: 8px; }
-        .num-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: var(--transition); background: rgba(255,255,255,0.06); color: var(--text2); border: 1px solid rgba(255,255,255,0.06); touch-action: manipulation; min-height: 40px; }
-        .num-cell:active { transform: scale(0.88); }
-        .num-cell.state-green { background: rgba(74,222,128,0.25); border-color: rgba(74,222,128,0.5); color: #4ade80; }
-        .num-cell.state-red { background: rgba(248,113,113,0.25); border-color: rgba(248,113,113,0.5); color: #f87171; }
+        .num-cell {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.25s, border-color 0.25s, color 0.25s, transform 0.15s;
+            background: rgba(255,255,255,0.06);
+            color: var(--text2);
+            border: 1px solid rgba(255,255,255,0.06);
+            touch-action: manipulation;
+            min-height: 40px;
+            will-change: transform, background-color, border-color;
+        }
+        .num-cell:active { transform: scale(0.82); }
+        .num-cell.state-green { background: rgba(74,222,128,0.25); border-color: rgba(74,222,128,0.5); color: #4ade80; animation: pulse 0.4s ease; }
+        .num-cell.state-red { background: rgba(248,113,113,0.25); border-color: rgba(248,113,113,0.5); color: #f87171; animation: pulse 0.4s ease; }
         .num-cell.state-none { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.06); color: var(--text2); }
         .players-bar {
             flex-shrink: 0;
@@ -346,9 +375,10 @@
             cursor: pointer;
             padding: 4px;
             touch-action: manipulation;
-            transition: var(--transition);
+            transition: transform 0.2s ease;
             border-radius: 50%;
             position: relative;
+            will-change: transform;
         }
         .player-circle-btn:active { transform: scale(0.85); }
         .player-circle-btn .circle {
@@ -364,6 +394,7 @@
             box-shadow: 0 6px 16px rgba(0,0,0,0.5);
             transition: var(--transition);
             border: 3px solid rgba(255,255,255,0.2);
+            will-change: transform, box-shadow, border-color;
         }
         .player-circle-btn .circle.me {
             border-color: #fff;
@@ -420,7 +451,6 @@
             padding: 10px 20px; font-size: 0.85rem; font-weight: 600; animation: pop 0.3s ease-out;
             pointer-events: none; white-space: nowrap; box-shadow: var(--shadow);
         }
-        /* Botón flotante amarillo para notas */
         .notes-float-btn {
             position: fixed;
             bottom: 100px;
@@ -440,9 +470,9 @@
             cursor: pointer;
             transition: var(--transition);
             touch-action: manipulation;
+            will-change: transform, background;
         }
         .notes-float-btn:active { transform: scale(0.85); background: #f59e0b; }
-        /* Modal de notas */
         .notes-modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -623,7 +653,7 @@
         </div>
     </div>
 
-    <!-- Botón flotante de notas (solo visible si están habilitadas) -->
+    <!-- Botón flotante de notas -->
     <button class="notes-float-btn" id="notes-float-btn" style="display:none;">📝</button>
 
     <!-- OVERLAYS -->
@@ -684,7 +714,6 @@
             function encodePlayersToBase36(players) { return (players - 1).toString(36).padStart(2, '0').toUpperCase(); }
             function decodePlayersFromBase36(twoChars) { return parseInt(twoChars, 36) + 1; }
 
-            // Flags combinados en el sexto carácter: 0=ambos off, 1=disableNumbers, 2=disableNotes, 3=ambos
             function encodeFlagsToChar(disableNumbers, disableNotes) {
                 if (!disableNumbers && !disableNotes) return '0';
                 if (disableNumbers && !disableNotes) return '1';
@@ -697,7 +726,7 @@
                     case '1': return { disableNumbers: true, disableNotes: false };
                     case '2': return { disableNumbers: false, disableNotes: true };
                     case '3': return { disableNumbers: true, disableNotes: true };
-                    default: return { disableNumbers: false, disableNotes: false }; // compatibilidad con seeds antiguas
+                    default: return { disableNumbers: false, disableNotes: false };
                 }
             }
 
@@ -723,7 +752,7 @@
             }
             function base36ToDecimal(base36Str) { return parseInt(base36Str, 36).toString(); }
 
-            // ===================== GENERACIÓN DE COLORES ÚNICOS =====================
+            // ===================== COLORES =====================
             function generateColorPalette() {
                 const colors = [];
                 for (let h = 0; h < 360; h++) {
@@ -765,13 +794,13 @@
                 return shuffled[playerIndex % shuffled.length];
             }
 
-            // ===================== GENERACIÓN DE NÚMEROS SECRETOS =====================
+            // ===================== NÚMEROS SECRETOS =====================
             function getPlayerSecretNumber(seedDecimalStr, playerIndex, limit) {
                 const rng = mulberry32(hashString(seedDecimalStr + '|num|' + playerIndex));
                 return Math.floor(rng() * limit) + 1;
             }
 
-            // ===================== ALMACENAMIENTO DE NOTAS =====================
+            // ===================== NOTAS =====================
             function getNotesStorageKey(seedDecimal, playerIndex) {
                 return `notes_${seedDecimal}_${playerIndex}`;
             }
@@ -784,19 +813,17 @@
                 localStorage.setItem(key, text);
             }
 
-            // ===================== ESTADO DEL JUEGO =====================
+            // ===================== ESTADO =====================
             let gameState = null;
             let currentView = 'home';
             let numberStates = {};
             let revealedPlayerIndex = null;
-            let lastTapOnCircle = {};
             let messageTimeout = null;
             let toastTimeout = null;
 
             function resetGameState() {
                 numberStates = {};
                 revealedPlayerIndex = null;
-                lastTapOnCircle = {};
                 hideRevealOverlay();
                 hideMessage();
                 hideNotesModal();
@@ -887,13 +914,6 @@
                     showToast('✅ Seed copiada: ' + text);
                 }
             }
-            async function shareSeed(seed) {
-                if (navigator.share) {
-                    try { await navigator.share({ title: 'Juego de Números — Seed', text: '🎲 Únete con la seed: ' + seed }); return; }
-                    catch (e) {}
-                }
-                copyToClipboard(seed);
-            }
 
             // ===================== RENDER: SELECCIÓN DE JUGADOR =====================
             function renderPlayerSelect() {
@@ -905,9 +925,9 @@
                     const color = getPlayerColorHex(gameState.seedDecimal, i);
                     const btn = document.createElement('button');
                     btn.className = 'player-select-btn';
+                    btn.style.animation = `slideInLeft 0.3s ease-out ${i * 0.02}s both`;
                     btn.innerHTML = `<div class="dot" style="background:${color};color:#000;">${i+1}</div>`;
                     btn.addEventListener('click', () => selectPlayer(i));
-                    btn.addEventListener('touchend', (e) => { e.preventDefault(); selectPlayer(i); });
                     grid.appendChild(btn);
                 }
             }
@@ -945,12 +965,12 @@
                     const btn = document.createElement('button');
                     btn.className = 'player-circle-btn';
                     btn.dataset.playerIndex = i;
+                    btn.style.animation = `slideInLeft 0.3s ease-out ${i * 0.02}s both`;
                     const isMe = (i === me);
                     const isRevealed = (revealedPlayerIndex === i);
                     const circleClass = 'circle' + (isMe ? ' me' : '') + (isRevealed ? ' revealed-glow' : '');
                     btn.innerHTML = `<div class="${circleClass}" style="background:${color};color:#000;">${i+1}</div>`;
                     btn.addEventListener('click', () => handleCircleTap(i));
-                    btn.addEventListener('touchend', (e) => { e.preventDefault(); handleCircleTap(i); });
                     container.appendChild(btn);
                 }
             }
@@ -973,7 +993,6 @@
                     cell.classList.remove('state-none', 'state-green', 'state-red');
                     cell.classList.add('state-' + state);
                     cell.addEventListener('click', () => cycleNumberState(n));
-                    cell.addEventListener('touchend', (e) => { e.preventDefault(); cycleNumberState(n); });
                     fragment.appendChild(cell);
                 }
                 grid.appendChild(fragment);
@@ -991,7 +1010,7 @@
                 }
             }
 
-            // ===================== LÓGICA DE ESTADOS DE NÚMEROS =====================
+            // ===================== LÓGICA DE NÚMEROS =====================
             function cycleNumberState(n) {
                 const current = numberStates[n] || 'none';
                 if (current === 'none') {
@@ -1023,7 +1042,7 @@
                 showMessage(`Rango ${xNum}–${yNum} aplicado ✓`, false, 1500);
             }
 
-            // ===================== TAP EN CÍRCULOS =====================
+            // ===================== TAP EN CÍRCULOS (SINGLE TAP) =====================
             function handleCircleTap(playerIndex) {
                 if (!gameState) return;
                 if (revealedPlayerIndex !== null) {
@@ -1035,14 +1054,7 @@
                     showMessage('🚫 NO PUEDES VER TU PROPIO NÚMERO', true, 1800);
                     return;
                 }
-                const now = Date.now();
-                const last = lastTapOnCircle[playerIndex] || 0;
-                if (now - last < 3000) {
-                    revealPlayerNumber(playerIndex);
-                    lastTapOnCircle[playerIndex] = 0;
-                } else {
-                    lastTapOnCircle[playerIndex] = now;
-                }
+                revealPlayerNumber(playerIndex);
             }
 
             function revealPlayerNumber(playerIndex) {
@@ -1141,7 +1153,9 @@
                 // Game
                 document.getElementById('btn-back-game').addEventListener('click', goHome);
                 document.getElementById('seed-badge').addEventListener('click', async () => {
-                    if (gameState) await shareSeed(gameState.seedDecimal);
+                    if (gameState) {
+                        await copyToClipboard(gameState.seedDecimal);
+                    }
                 });
                 document.getElementById('btn-apply-range').addEventListener('click', () => {
                     applyRange(document.getElementById('range-x').value, document.getElementById('range-y').value);
@@ -1188,17 +1202,11 @@
 
                 // Reveal overlay
                 document.getElementById('reveal-overlay').addEventListener('click', () => { hideRevealOverlay(); renderPlayersBar(); });
-                document.getElementById('reveal-overlay').addEventListener('touchend', (e) => { e.preventDefault(); hideRevealOverlay(); renderPlayersBar(); });
 
                 // Tap fuera para ocultar número revelado
                 document.getElementById('game-body').addEventListener('click', (e) => {
                     if (revealedPlayerIndex !== null && !e.target.closest('.player-circle-btn') && !e.target.closest('.seed-badge') && !e.target.closest('.back-btn') && !e.target.closest('.players-header') && !e.target.closest('.notes-float-btn') && !e.target.closest('.notes-modal-overlay')) {
                         hideRevealOverlay(); renderPlayersBar();
-                    }
-                });
-                document.getElementById('game-body').addEventListener('touchend', (e) => {
-                    if (revealedPlayerIndex !== null && !e.target.closest('.player-circle-btn') && !e.target.closest('.seed-badge') && !e.target.closest('.back-btn') && !e.target.closest('.players-header') && !e.target.closest('.notes-float-btn') && !e.target.closest('.notes-modal-overlay')) {
-                        e.preventDefault(); hideRevealOverlay(); renderPlayersBar();
                     }
                 });
 
