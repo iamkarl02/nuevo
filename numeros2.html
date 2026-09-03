@@ -15,6 +15,7 @@
             --accent2: #5a4bd0;
             --green: #4ade80;
             --red: #f87171;
+            --yellow: #fbbf24;
             --radius: 14px;
             --radius-sm: 8px;
             --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
@@ -419,6 +420,90 @@
             padding: 10px 20px; font-size: 0.85rem; font-weight: 600; animation: pop 0.3s ease-out;
             pointer-events: none; white-space: nowrap; box-shadow: var(--shadow);
         }
+        /* Botón flotante amarillo para notas */
+        .notes-float-btn {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            z-index: 8;
+            background: var(--yellow);
+            color: #000;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: none;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+            touch-action: manipulation;
+        }
+        .notes-float-btn:active { transform: scale(0.85); background: #f59e0b; }
+        /* Modal de notas */
+        .notes-modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 12;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.25s ease-out;
+        }
+        .notes-modal-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 20px;
+            width: 100%;
+            max-width: 420px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255,255,255,0.08);
+            animation: pop 0.35s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        .notes-modal-card .notes-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-align: center;
+            color: var(--yellow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .notes-modal-card textarea {
+            width: 100%;
+            flex: 1;
+            min-height: 200px;
+            padding: 12px;
+            border: 2px solid rgba(255,255,255,0.12);
+            border-radius: var(--radius-sm);
+            background: var(--surface2);
+            color: var(--text);
+            font-size: 1rem;
+            font-weight: 500;
+            outline: none;
+            resize: vertical;
+            user-select: text;
+            -webkit-user-select: text;
+            touch-action: manipulation;
+        }
+        .notes-modal-card textarea:focus { border-color: var(--yellow); box-shadow: 0 0 0 3px rgba(251,191,36,0.2); }
+        .notes-modal-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+        .notes-modal-actions .btn { flex: 1; }
         @media (min-width: 768px) {
             .numbers-grid { grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)); }
             .home-container { max-width: 520px; }
@@ -434,7 +519,7 @@
 </head>
 <body>
 
-    <!-- VISTA: HOME (sin botón de configuración) -->
+    <!-- VISTA: HOME -->
     <div id="view-home" class="view active">
         <div class="home-container">
             <div class="home-title">🎲 JUEGO DE NÚMEROS</div>
@@ -446,7 +531,7 @@
         </div>
     </div>
 
-    <!-- VISTA: CONFIG (accesible solo tras pulsar INICIAR) -->
+    <!-- VISTA: CONFIG -->
     <div id="view-config" class="view">
         <button class="back-btn" id="btn-back-config">←</button>
         <div class="config-container">
@@ -469,6 +554,16 @@
                         </label>
                     </div>
                     <p style="font-size:0.75rem;color:var(--text2);margin-top:4px;">Oculta la interfaz de deducción por números. Los números secretos siguen existiendo.</p>
+                </div>
+                <div class="config-row">
+                    <div class="config-row-horizontal">
+                        <span class="label" style="margin-bottom:0;">📝 Notas Personales</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="cfg-enable-notes" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <p style="font-size:0.75rem;color:var(--text2);margin-top:4px;">Permite que cada jugador tenga un espacio de notas privado en su dispositivo.</p>
                 </div>
                 <button class="btn btn-primary btn-lg btn-full" id="btn-generate-config" style="margin-top:8px;">⚡ GENERAR SEED CON ESTA CONFIGURACIÓN</button>
             </div>
@@ -528,6 +623,9 @@
         </div>
     </div>
 
+    <!-- Botón flotante de notas (solo visible si están habilitadas) -->
+    <button class="notes-float-btn" id="notes-float-btn" style="display:none;">📝</button>
+
     <!-- OVERLAYS -->
     <div id="reveal-overlay" class="reveal-overlay" style="display:none;">
         <div class="reveal-number" id="reveal-number-text">42</div>
@@ -540,6 +638,17 @@
             <input type="text" class="input" id="seed-input-field" placeholder="Ej: 1234567890" maxlength="10" autocomplete="off" spellcheck="false">
             <button class="btn btn-primary btn-lg btn-full" id="btn-seed-continue">CONTINUAR</button>
             <button class="btn btn-secondary btn-sm btn-full" id="btn-seed-cancel">CANCELAR</button>
+        </div>
+    </div>
+    <!-- Modal de notas -->
+    <div id="notes-modal-overlay" class="notes-modal-overlay" style="display:none;">
+        <div class="notes-modal-card">
+            <div class="notes-title">📝 MIS NOTAS</div>
+            <textarea id="notes-textarea" placeholder="Escribe aquí tus observaciones..."></textarea>
+            <div class="notes-modal-actions">
+                <button class="btn btn-secondary" id="btn-notes-cancel">CANCELAR</button>
+                <button class="btn btn-primary" id="btn-notes-save" style="background:var(--yellow);color:#000;">GUARDAR</button>
+            </div>
         </div>
     </div>
     <div id="toast" class="toast" style="display:none;"></div>
@@ -574,10 +683,28 @@
             function decodeLimitFromBase36(threeChars) { return parseInt(threeChars, 36) + 1; }
             function encodePlayersToBase36(players) { return (players - 1).toString(36).padStart(2, '0').toUpperCase(); }
             function decodePlayersFromBase36(twoChars) { return parseInt(twoChars, 36) + 1; }
-            function generateBase36Seed(limit, players, disableNumbers) {
+
+            // Flags combinados en el sexto carácter: 0=ambos off, 1=disableNumbers, 2=disableNotes, 3=ambos
+            function encodeFlagsToChar(disableNumbers, disableNotes) {
+                if (!disableNumbers && !disableNotes) return '0';
+                if (disableNumbers && !disableNotes) return '1';
+                if (!disableNumbers && disableNotes) return '2';
+                return '3';
+            }
+            function decodeFlagsFromChar(c) {
+                switch(c) {
+                    case '0': return { disableNumbers: false, disableNotes: false };
+                    case '1': return { disableNumbers: true, disableNotes: false };
+                    case '2': return { disableNumbers: false, disableNotes: true };
+                    case '3': return { disableNumbers: true, disableNotes: true };
+                    default: return { disableNumbers: false, disableNotes: false }; // compatibilidad con seeds antiguas
+                }
+            }
+
+            function generateBase36Seed(limit, players, disableNumbers, disableNotes) {
                 const l = encodeLimitToBase36(limit);
                 const p = encodePlayersToBase36(players);
-                const flag = disableNumbers ? '1' : '0';
+                const flag = encodeFlagsToChar(disableNumbers, disableNotes);
                 return (l + p + flag).toUpperCase();
             }
             function parseBase36Seed(base36Str) {
@@ -586,8 +713,8 @@
                 for (const c of clean) if (!/[0-9A-Z]/.test(c)) throw new Error('Carácter inválido');
                 const limit = decodeLimitFromBase36(clean.substring(0, 3));
                 const players = decodePlayersFromBase36(clean.substring(3, 5));
-                const disableNumbers = clean[5] === '1';
-                return { limit, players, disableNumbers };
+                const flags = decodeFlagsFromChar(clean[5]);
+                return { limit, players, disableNumbers: flags.disableNumbers, disableNotes: flags.disableNotes };
             }
             function decimalToBase36(decimalStr) {
                 let num = parseInt(decimalStr, 10);
@@ -644,6 +771,19 @@
                 return Math.floor(rng() * limit) + 1;
             }
 
+            // ===================== ALMACENAMIENTO DE NOTAS =====================
+            function getNotesStorageKey(seedDecimal, playerIndex) {
+                return `notes_${seedDecimal}_${playerIndex}`;
+            }
+            function loadNotes(seedDecimal, playerIndex) {
+                const key = getNotesStorageKey(seedDecimal, playerIndex);
+                return localStorage.getItem(key) || '';
+            }
+            function saveNotes(seedDecimal, playerIndex, text) {
+                const key = getNotesStorageKey(seedDecimal, playerIndex);
+                localStorage.setItem(key, text);
+            }
+
             // ===================== ESTADO DEL JUEGO =====================
             let gameState = null;
             let currentView = 'home';
@@ -659,6 +799,8 @@
                 lastTapOnCircle = {};
                 hideRevealOverlay();
                 hideMessage();
+                hideNotesModal();
+                updateNotesButtonVisibility();
             }
 
             // ===================== NAVEGACIÓN =====================
@@ -666,6 +808,8 @@
                 document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
                 const target = document.getElementById('view-' + viewId);
                 if (target) { target.classList.add('active'); currentView = viewId; }
+                updateNotesButtonVisibility();
+                if (viewId !== 'game') hideNotesModal();
             }
             function goHome() { resetGameState(); gameState = null; showView('home'); }
             function goConfig() { showView('config'); }
@@ -709,6 +853,30 @@
             }
             function hideSeedInputOverlay() {
                 document.getElementById('seed-input-overlay').style.display = 'none';
+            }
+            function updateNotesButtonVisibility() {
+                const btn = document.getElementById('notes-float-btn');
+                if (currentView === 'game' && gameState && !gameState.disableNotes) {
+                    btn.style.display = 'flex';
+                } else {
+                    btn.style.display = 'none';
+                }
+            }
+            function showNotesModal() {
+                if (!gameState) return;
+                const text = loadNotes(gameState.seedDecimal, gameState.currentPlayerIndex);
+                document.getElementById('notes-textarea').value = text;
+                document.getElementById('notes-modal-overlay').style.display = 'flex';
+            }
+            function hideNotesModal() {
+                document.getElementById('notes-modal-overlay').style.display = 'none';
+            }
+            function saveNotesFromModal() {
+                if (!gameState) return;
+                const text = document.getElementById('notes-textarea').value;
+                saveNotes(gameState.seedDecimal, gameState.currentPlayerIndex, text);
+                hideNotesModal();
+                showToast('✅ Notas guardadas');
             }
             async function copyToClipboard(text) {
                 try { await navigator.clipboard.writeText(text); showToast('✅ Seed copiada: ' + text); }
@@ -763,6 +931,7 @@
                 renderPlayersBar();
                 renderNumbersGrid();
                 updateNumbersVisibility();
+                updateNotesButtonVisibility();
             }
 
             function renderPlayersBar() {
@@ -823,7 +992,6 @@
             }
 
             // ===================== LÓGICA DE ESTADOS DE NÚMEROS =====================
-            // Ciclo: SIN COLOR -> VERDE -> ROJO -> SIN COLOR
             function cycleNumberState(n) {
                 const current = numberStates[n] || 'none';
                 if (current === 'none') {
@@ -847,9 +1015,7 @@
                     showMessage('Rango inválido. Verifica los valores.', true);
                     return;
                 }
-                // Paso 1: borrar todos los estados
                 numberStates = {};
-                // Paso 2: marcar rango en verde
                 for (let n = xNum; n <= yNum; n++) {
                     numberStates[n] = 'green';
                 }
@@ -906,14 +1072,14 @@
             }
 
             // ===================== GENERAR Y CARGAR =====================
-            function generateAndStart(limit, players, disableNumbers) {
+            function generateAndStart(limit, players, disableNumbers, disableNotes) {
                 let playerCount = players;
                 if (!playerCount || isNaN(playerCount) || playerCount < 2) {
                     playerCount = Math.floor(Math.random() * 48) + 2;
                 }
                 playerCount = Math.min(1296, Math.max(2, Math.round(playerCount)));
                 limit = Math.min(46656, Math.max(1, Math.round(limit)));
-                const base36 = generateBase36Seed(limit, playerCount, disableNumbers);
+                const base36 = generateBase36Seed(limit, playerCount, disableNumbers, disableNotes);
                 const decimal = base36ToDecimal(base36);
                 const parsed = parseBase36Seed(base36);
                 gameState = {
@@ -921,6 +1087,7 @@
                     limit: parsed.limit,
                     players: parsed.players,
                     disableNumbers: parsed.disableNumbers,
+                    disableNotes: parsed.disableNotes,
                     currentPlayerIndex: 0,
                 };
                 resetGameState();
@@ -938,6 +1105,7 @@
                         limit: parsed.limit,
                         players: parsed.players,
                         disableNumbers: parsed.disableNumbers,
+                        disableNotes: parsed.disableNotes,
                         currentPlayerIndex: 0,
                     };
                     resetGameState();
@@ -949,7 +1117,7 @@
 
             // ===================== EVENTOS =====================
             document.addEventListener('DOMContentLoaded', () => {
-                // Home (sin botón de configuración)
+                // Home
                 document.getElementById('btn-generate-home').addEventListener('click', goConfig);
                 document.getElementById('btn-add-seed-home').addEventListener('click', showSeedInputOverlay);
 
@@ -961,7 +1129,9 @@
                     const playersInput = document.getElementById('cfg-players');
                     const players = playersInput.value.trim() === '' ? null : parseInt(playersInput.value);
                     const disable = document.getElementById('cfg-disable-numbers').checked;
-                    const seed = generateAndStart(limit, players, disable);
+                    const enableNotes = document.getElementById('cfg-enable-notes').checked;
+                    const disableNotes = !enableNotes;
+                    const seed = generateAndStart(limit, players, disable, disableNotes);
                     showToast('🎲 Seed generada: ' + seed, 2000);
                 });
 
@@ -975,6 +1145,14 @@
                 });
                 document.getElementById('btn-apply-range').addEventListener('click', () => {
                     applyRange(document.getElementById('range-x').value, document.getElementById('range-y').value);
+                });
+
+                // Notas
+                document.getElementById('notes-float-btn').addEventListener('click', showNotesModal);
+                document.getElementById('btn-notes-cancel').addEventListener('click', hideNotesModal);
+                document.getElementById('btn-notes-save').addEventListener('click', saveNotesFromModal);
+                document.getElementById('notes-modal-overlay').addEventListener('click', (e) => {
+                    if (e.target === document.getElementById('notes-modal-overlay')) hideNotesModal();
                 });
 
                 // Flechas y buscador
@@ -1014,12 +1192,12 @@
 
                 // Tap fuera para ocultar número revelado
                 document.getElementById('game-body').addEventListener('click', (e) => {
-                    if (revealedPlayerIndex !== null && !e.target.closest('.player-circle-btn') && !e.target.closest('.seed-badge') && !e.target.closest('.back-btn') && !e.target.closest('.players-header')) {
+                    if (revealedPlayerIndex !== null && !e.target.closest('.player-circle-btn') && !e.target.closest('.seed-badge') && !e.target.closest('.back-btn') && !e.target.closest('.players-header') && !e.target.closest('.notes-float-btn') && !e.target.closest('.notes-modal-overlay')) {
                         hideRevealOverlay(); renderPlayersBar();
                     }
                 });
                 document.getElementById('game-body').addEventListener('touchend', (e) => {
-                    if (revealedPlayerIndex !== null && !e.target.closest('.player-circle-btn') && !e.target.closest('.seed-badge') && !e.target.closest('.back-btn') && !e.target.closest('.players-header')) {
+                    if (revealedPlayerIndex !== null && !e.target.closest('.player-circle-btn') && !e.target.closest('.seed-badge') && !e.target.closest('.back-btn') && !e.target.closest('.players-header') && !e.target.closest('.notes-float-btn') && !e.target.closest('.notes-modal-overlay')) {
                         e.preventDefault(); hideRevealOverlay(); renderPlayersBar();
                     }
                 });
@@ -1028,6 +1206,7 @@
                 document.getElementById('cfg-limit').value = 100;
                 document.getElementById('cfg-players').value = '';
                 document.getElementById('cfg-disable-numbers').checked = false;
+                document.getElementById('cfg-enable-notes').checked = true;
             });
 
             document.addEventListener('touchend', (e) => {
