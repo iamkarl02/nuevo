@@ -221,7 +221,6 @@
             font-weight: 700; font-size: 1.1rem; color: #000;
             box-shadow: 0 4px 12px rgba(0,0,0,0.4);
         }
-        .player-select-btn .name { font-size: 0.75rem; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.04em; }
         .game-container { flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; }
         .game-topbar {
             display: flex; align-items: center; justify-content: space-between;
@@ -269,28 +268,168 @@
         .num-cell.state-green { background: rgba(74,222,128,0.25); border-color: rgba(74,222,128,0.5); color: #4ade80; }
         .num-cell.state-red { background: rgba(248,113,113,0.25); border-color: rgba(248,113,113,0.5); color: #f87171; }
         .num-cell.state-none { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.06); color: var(--text2); }
-        .players-bar { flex-shrink: 0; background: rgba(10,10,15,0.9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid rgba(255,255,255,0.06); padding: 10px 8px; z-index: 3; }
-        .players-scroll { display: flex; gap: 10px; overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 4px; scrollbar-width: none; -ms-overflow-style: none; }
+        .players-bar {
+            flex-shrink: 0;
+            background: rgba(10,10,15,0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(255,255,255,0.06);
+            padding: 8px;
+            z-index: 3;
+        }
+        .players-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 6px;
+            padding: 0 4px;
+        }
+        .players-header .search-box {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 20px;
+            padding: 4px 8px;
+        }
+        .players-header .search-box input {
+            width: 60px;
+            background: transparent;
+            border: none;
+            color: var(--text);
+            font-weight: 700;
+            text-align: center;
+            outline: none;
+            font-size: 0.9rem;
+            padding: 4px;
+        }
+        .players-header .search-box button {
+            background: var(--accent);
+            border: none;
+            border-radius: 14px;
+            width: 28px;
+            height: 28px;
+            color: #fff;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .arrow-btn {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text);
+            font-size: 1.2rem;
+            transition: var(--transition);
+            flex-shrink: 0;
+            touch-action: manipulation;
+        }
+        .arrow-btn:active { background: rgba(255,255,255,0.2); transform: scale(0.9); }
+        .players-scroll {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 4px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            scroll-behavior: smooth;
+        }
         .players-scroll::-webkit-scrollbar { display: none; }
-        .player-circle-btn { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; background: transparent; border: none; cursor: pointer; padding: 4px; touch-action: manipulation; transition: var(--transition); border-radius: 12px; position: relative; }
-        .player-circle-btn:active { transform: scale(0.9); }
-        .player-circle-btn .circle { width: clamp(48px, 10vw, 64px); height: clamp(48px, 10vw, 64px); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: clamp(1rem, 2.5vw, 1.3rem); font-weight: 800; color: #000; box-shadow: 0 6px 16px rgba(0,0,0,0.5); transition: var(--transition); border: 3px solid rgba(255,255,255,0.2); position: relative; }
-        .player-circle-btn .circle.me { border-color: #fff; box-shadow: 0 0 0 4px rgba(255,255,255,0.3), 0 6px 16px rgba(0,0,0,0.5); }
+        .player-circle-btn {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            touch-action: manipulation;
+            transition: var(--transition);
+            border-radius: 50%;
+            position: relative;
+        }
+        .player-circle-btn:active { transform: scale(0.85); }
+        .player-circle-btn .circle {
+            width: clamp(48px, 10vw, 64px);
+            height: clamp(48px, 10vw, 64px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            font-weight: 800;
+            color: #000;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.5);
+            transition: var(--transition);
+            border: 3px solid rgba(255,255,255,0.2);
+        }
+        .player-circle-btn .circle.me {
+            border-color: #fff;
+            box-shadow: 0 0 0 4px rgba(255,255,255,0.3), 0 6px 16px rgba(0,0,0,0.5);
+        }
         .player-circle-btn .circle.revealed-glow { animation: glow 1.5s ease-in-out infinite; }
-        .player-circle-btn .plabel { font-size: 0.65rem; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; text-align: center; white-space: nowrap; }
-        .reveal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 10; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); animation: fadeIn 0.25s ease-out; pointer-events: auto; cursor: pointer; touch-action: manipulation; }
-        .reveal-number { font-size: clamp(5rem, 25vw, 12rem); font-weight: 900; color: #fff; animation: pop 0.4s cubic-bezier(0.34,1.56,0.64,1); text-shadow: 0 8px 32px rgba(0,0,0,0.8); pointer-events: none; user-select: none; -webkit-user-select: none; }
-        .reveal-label { position: absolute; bottom: 30%; left: 50%; transform: translateX(-50%); font-size: 0.9rem; font-weight: 600; color: var(--text2); letter-spacing: 0.1em; text-transform: uppercase; pointer-events: none; animation: fadeIn 0.4s ease-out 0.1s both; }
-        .message-overlay { position: fixed; top: 15%; left: 50%; transform: translateX(-50%); z-index: 15; background: rgba(20,20,30,0.95); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius); padding: 16px 24px; font-weight: 700; font-size: 1rem; animation: pop 0.3s ease-out; text-align: center; pointer-events: none; box-shadow: var(--shadow); max-width: 90vw; }
+        .reveal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 10;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+            animation: fadeIn 0.25s ease-out; pointer-events: auto; cursor: pointer; touch-action: manipulation;
+        }
+        .reveal-number {
+            font-size: clamp(5rem, 25vw, 12rem); font-weight: 900; color: #fff;
+            animation: pop 0.4s cubic-bezier(0.34,1.56,0.64,1);
+            text-shadow: 0 8px 32px rgba(0,0,0,0.8); pointer-events: none; user-select: none; -webkit-user-select: none;
+        }
+        .reveal-label {
+            position: absolute; bottom: 30%; left: 50%; transform: translateX(-50%);
+            font-size: 0.9rem; font-weight: 600; color: var(--text2); letter-spacing: 0.1em;
+            text-transform: uppercase; pointer-events: none; animation: fadeIn 0.4s ease-out 0.1s both;
+        }
+        .message-overlay {
+            position: fixed; top: 15%; left: 50%; transform: translateX(-50%); z-index: 15;
+            background: rgba(20,20,30,0.95); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: var(--radius); padding: 16px 24px; font-weight: 700; font-size: 1rem;
+            animation: pop 0.3s ease-out; text-align: center; pointer-events: none; box-shadow: var(--shadow); max-width: 90vw;
+        }
         .message-overlay.error { border-color: var(--red); color: var(--red); }
         .message-overlay.success { border-color: var(--green); color: var(--green); }
-        .seed-input-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 10; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); padding: 20px; animation: fadeIn 0.25s ease-out; }
-        .seed-input-card { background: var(--surface); border-radius: var(--radius); padding: 24px; width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,0.08); animation: pop 0.35s cubic-bezier(0.34,1.56,0.64,1); }
+        .seed-input-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 10;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+            padding: 20px; animation: fadeIn 0.25s ease-out;
+        }
+        .seed-input-card {
+            background: var(--surface); border-radius: var(--radius); padding: 24px; width: 100%; max-width: 380px;
+            display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow);
+            border: 1px solid rgba(255,255,255,0.08); animation: pop 0.35s cubic-bezier(0.34,1.56,0.64,1);
+        }
         .seed-input-card .title { font-size: 1.2rem; font-weight: 700; text-align: center; }
         .seed-input-card .input { text-align: center; font-size: 1.5rem; font-weight: 800; letter-spacing: 0.1em; }
-        .back-btn { position: absolute; top: 10px; left: 10px; z-index: 6; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.2rem; color: var(--text); transition: var(--transition); touch-action: manipulation; }
+        .back-btn {
+            position: absolute; top: 10px; left: 10px; z-index: 6;
+            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 1.2rem; color: var(--text); transition: var(--transition); touch-action: manipulation;
+        }
         .back-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.15); }
-        .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); z-index: 20; background: rgba(20,20,30,0.95); border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; padding: 10px 20px; font-size: 0.85rem; font-weight: 600; animation: pop 0.3s ease-out; pointer-events: none; white-space: nowrap; box-shadow: var(--shadow); }
+        .toast {
+            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); z-index: 20;
+            background: rgba(20,20,30,0.95); border: 1px solid rgba(255,255,255,0.12); border-radius: 20px;
+            padding: 10px 20px; font-size: 0.85rem; font-weight: 600; animation: pop 0.3s ease-out;
+            pointer-events: none; white-space: nowrap; box-shadow: var(--shadow);
+        }
         @media (min-width: 768px) {
             .numbers-grid { grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)); }
             .home-container { max-width: 520px; }
@@ -385,6 +524,14 @@
                         </div>
                     </div>
                     <div class="players-bar">
+                        <div class="players-header">
+                            <button class="arrow-btn" id="btn-scroll-left">←</button>
+                            <div class="search-box">
+                                <input type="number" id="search-player-input" placeholder="Nº" min="1" step="1">
+                                <button id="btn-go-player">IR</button>
+                            </div>
+                            <button class="arrow-btn" id="btn-scroll-right">→</button>
+                        </div>
                         <div class="players-scroll" id="players-scroll"></div>
                     </div>
                 </div>
@@ -412,7 +559,7 @@
         (function() {
             // ===================== CONSTANTES =====================
             const SEED_BASE36_LENGTH = 6;
-            const MAX_SEED_DECIMAL = Math.pow(36, SEED_BASE36_LENGTH) - 1; // 2176782335
+            const MAX_SEED_DECIMAL = Math.pow(36, SEED_BASE36_LENGTH) - 1;
             const PASTEL_COLORS = [
                 '#FF6B6B','#6BC5FF','#6BFF8A','#FFE66B','#C56BFF',
                 '#FFB46B','#FF6BC5','#6BFFE6','#B4FF6B','#FF8A6B',
@@ -441,18 +588,10 @@
             }
 
             // ===================== CODIFICACIÓN / DECODIFICACIÓN SEED =====================
-            function encodeLimitToBase36(limit) {
-                return (limit - 1).toString(36).padStart(3, '0').toUpperCase();
-            }
-            function decodeLimitFromBase36(threeChars) {
-                return parseInt(threeChars, 36) + 1;
-            }
-            function encodePlayersToBase36(players) {
-                return (players - 1).toString(36).padStart(2, '0').toUpperCase();
-            }
-            function decodePlayersFromBase36(twoChars) {
-                return parseInt(twoChars, 36) + 1;
-            }
+            function encodeLimitToBase36(limit) { return (limit - 1).toString(36).padStart(3, '0').toUpperCase(); }
+            function decodeLimitFromBase36(threeChars) { return parseInt(threeChars, 36) + 1; }
+            function encodePlayersToBase36(players) { return (players - 1).toString(36).padStart(2, '0').toUpperCase(); }
+            function decodePlayersFromBase36(twoChars) { return parseInt(twoChars, 36) + 1; }
             function generateBase36Seed(limit, players, disableNumbers) {
                 const l = encodeLimitToBase36(limit);
                 const p = encodePlayersToBase36(players);
@@ -461,12 +600,8 @@
             }
             function parseBase36Seed(base36Str) {
                 const clean = base36Str.toUpperCase().trim();
-                if (clean.length !== SEED_BASE36_LENGTH) {
-                    throw new Error('Seed inválida');
-                }
-                for (const c of clean) {
-                    if (!/[0-9A-Z]/.test(c)) throw new Error('Carácter inválido');
-                }
+                if (clean.length !== SEED_BASE36_LENGTH) throw new Error('Seed inválida');
+                for (const c of clean) if (!/[0-9A-Z]/.test(c)) throw new Error('Carácter inválido');
                 const limit = decodeLimitFromBase36(clean.substring(0, 3));
                 const players = decodePlayersFromBase36(clean.substring(3, 5));
                 const disableNumbers = clean[5] === '1';
@@ -477,18 +612,28 @@
                 if (isNaN(num) || num < 0 || num > MAX_SEED_DECIMAL) throw new Error('Número fuera de rango');
                 return num.toString(36).padStart(SEED_BASE36_LENGTH, '0').toUpperCase();
             }
-            function base36ToDecimal(base36Str) {
-                return parseInt(base36Str, 36).toString();
-            }
+            function base36ToDecimal(base36Str) { return parseInt(base36Str, 36).toString(); }
 
             // ===================== GENERACIÓN DETERMINISTA =====================
+            // Números secretos aleatorios entre 1 y límite
             function getPlayerSecretNumber(seedDecimalStr, playerIndex, limit) {
-                const h = hashString(seedDecimalStr + '|num|' + playerIndex);
-                return (h % limit) + 1;
+                const rng = mulberry32(hashString(seedDecimalStr + '|num|' + playerIndex));
+                return Math.floor(rng() * limit) + 1;
+            }
+
+            // Colores únicos: barajar la paleta deterministamente y asignar por índice sin repetición hasta 24
+            function getShuffledColors(seedDecimalStr) {
+                const arr = [...PASTEL_COLORS];
+                const rng = mulberry32(hashString(seedDecimalStr + '|colors'));
+                for (let i = arr.length - 1; i > 0; i--) {
+                    const j = Math.floor(rng() * (i + 1));
+                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                }
+                return arr;
             }
             function getPlayerColorHex(seedDecimalStr, playerIndex) {
-                const h = hashString(seedDecimalStr + '|color|' + playerIndex);
-                return PASTEL_COLORS[h % PASTEL_COLORS.length];
+                const shuffled = getShuffledColors(seedDecimalStr);
+                return shuffled[playerIndex % shuffled.length];
             }
 
             // ===================== ESTADO DEL JUEGO =====================
@@ -541,10 +686,9 @@
                 toastTimeout = setTimeout(() => { el.style.display = 'none'; }, duration);
             }
             function showRevealOverlay(number, label) {
-                const overlay = document.getElementById('reveal-overlay');
                 document.getElementById('reveal-number-text').textContent = number;
                 document.getElementById('reveal-number-label').textContent = label || 'TOCA PARA OCULTAR';
-                overlay.style.display = 'flex';
+                document.getElementById('reveal-overlay').style.display = 'flex';
             }
             function hideRevealOverlay() {
                 document.getElementById('reveal-overlay').style.display = 'none';
@@ -585,7 +729,7 @@
                     const color = getPlayerColorHex(gameState.seedDecimal, i);
                     const btn = document.createElement('button');
                     btn.className = 'player-select-btn';
-                    btn.innerHTML = `<div class="dot" style="background:${color};color:#000;">${i+1}</div><span class="name">JUGADOR ${i+1}</span>`;
+                    btn.innerHTML = `<div class="dot" style="background:${color};color:#000;">${i+1}</div>`;
                     btn.addEventListener('click', () => selectPlayer(i));
                     btn.addEventListener('touchend', (e) => { e.preventDefault(); selectPlayer(i); });
                     grid.appendChild(btn);
@@ -611,6 +755,7 @@
                 renderNumbersGrid();
                 updateNumbersVisibility();
             }
+
             function renderPlayersBar() {
                 if (!gameState) return;
                 const container = document.getElementById('players-scroll');
@@ -625,12 +770,13 @@
                     const isMe = (i === me);
                     const isRevealed = (revealedPlayerIndex === i);
                     const circleClass = 'circle' + (isMe ? ' me' : '') + (isRevealed ? ' revealed-glow' : '');
-                    btn.innerHTML = `<div class="${circleClass}" style="background:${color};color:#000;">${i+1}</div><span class="plabel">${isMe ? 'TÚ' : 'J'+(i+1)}</span>`;
+                    btn.innerHTML = `<div class="${circleClass}" style="background:${color};color:#000;">${i+1}</div>`;
                     btn.addEventListener('click', () => handleCircleTap(i));
                     btn.addEventListener('touchend', (e) => { e.preventDefault(); handleCircleTap(i); });
                     container.appendChild(btn);
                 }
             }
+
             function renderNumbersGrid() {
                 const grid = document.getElementById('numbers-grid');
                 grid.innerHTML = '';
@@ -648,30 +794,35 @@
                     const state = numberStates[n] || 'none';
                     cell.classList.add('state-' + state);
                     cell.addEventListener('click', () => cycleNumberState(n));
-                    cell.addEventListener('touchend', (e) => { e.preventDefault(); cycleNumberState(n); });
                     fragment.appendChild(cell);
                 }
                 grid.appendChild(fragment);
             }
+
             function updateNumbersVisibility() {
                 const area = document.getElementById('numbers-area');
                 const rangeBar = document.getElementById('range-bar');
                 if (gameState && gameState.disableNumbers) {
-                    area.style.display = 'none'; rangeBar.style.display = 'none';
+                    area.style.display = 'none';
+                    rangeBar.style.display = 'none';
                 } else {
-                    area.style.display = 'flex'; rangeBar.style.display = 'flex';
+                    area.style.display = 'flex';
+                    rangeBar.style.display = 'flex';
                 }
             }
+
             function cycleNumberState(n) {
                 const current = numberStates[n] || 'none';
                 if (current === 'none') numberStates[n] = 'green';
                 else if (current === 'green') numberStates[n] = 'red';
-                else if (current === 'red') delete numberStates[n];
+                else delete numberStates[n];
                 renderNumbersGrid();
             }
+
             function applyRange(x, y) {
                 if (!gameState || gameState.disableNumbers) return;
-                const xNum = parseInt(x); const yNum = parseInt(y);
+                const xNum = parseInt(x);
+                const yNum = parseInt(y);
                 if (isNaN(xNum) || isNaN(yNum) || xNum < 1 || yNum < xNum || yNum > gameState.limit) {
                     showMessage('Rango inválido. Verifica los valores.', true);
                     return;
@@ -685,7 +836,11 @@
             // ===================== TAP EN CÍRCULOS =====================
             function handleCircleTap(playerIndex) {
                 if (!gameState) return;
-                if (revealedPlayerIndex !== null) { hideRevealOverlay(); renderPlayersBar(); return; }
+                if (revealedPlayerIndex !== null) {
+                    hideRevealOverlay();
+                    renderPlayersBar();
+                    return;
+                }
                 if (playerIndex === gameState.currentPlayerIndex) {
                     showMessage('🚫 NO PUEDES VER TU PROPIO NÚMERO', true, 1800);
                     return;
@@ -699,6 +854,7 @@
                     lastTapOnCircle[playerIndex] = now;
                 }
             }
+
             function revealPlayerNumber(playerIndex) {
                 if (!gameState || playerIndex === gameState.currentPlayerIndex) return;
                 const secret = getPlayerSecretNumber(gameState.seedDecimal, playerIndex, gameState.limit);
@@ -707,12 +863,30 @@
                 renderPlayersBar();
             }
 
+            // ===================== BUSCADOR Y FLECHAS =====================
+            function scrollToPlayer(playerNumber) {
+                if (!gameState) return;
+                const idx = parseInt(playerNumber);
+                if (isNaN(idx) || idx < 1 || idx > gameState.players) {
+                    showMessage('Jugador fuera de rango', true);
+                    return;
+                }
+                const playerIndex = idx - 1;
+                const container = document.getElementById('players-scroll');
+                const targetBtn = container.querySelector(`.player-circle-btn[data-player-index="${playerIndex}"]`);
+                if (targetBtn) {
+                    targetBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                    // resaltar temporalmente
+                    targetBtn.style.transform = 'scale(1.2)';
+                    setTimeout(() => { targetBtn.style.transform = ''; }, 600);
+                }
+            }
+
             // ===================== GENERAR Y CARGAR =====================
             function generateAndStart(limit, players, disableNumbers) {
-                // limit ya validado en input
                 let playerCount = players;
                 if (!playerCount || isNaN(playerCount) || playerCount < 2) {
-                    playerCount = Math.floor(Math.random() * 48) + 2; // 2-49 aleatorio
+                    playerCount = Math.floor(Math.random() * 48) + 2;
                 }
                 playerCount = Math.min(1296, Math.max(2, Math.round(playerCount)));
                 limit = Math.min(46656, Math.max(1, Math.round(limit)));
@@ -730,6 +904,7 @@
                 goSelect();
                 return decimal;
             }
+
             function loadSeedAndStart(seedDecimalStr) {
                 try {
                     const decimalTrim = seedDecimalStr.trim();
@@ -755,6 +930,7 @@
                 document.getElementById('btn-generate-home').addEventListener('click', goConfig);
                 document.getElementById('btn-config-home').addEventListener('click', goConfig);
                 document.getElementById('btn-add-seed-home').addEventListener('click', showSeedInputOverlay);
+
                 // Config
                 document.getElementById('btn-back-config').addEventListener('click', goHome);
                 document.getElementById('btn-generate-config').addEventListener('click', () => {
@@ -766,8 +942,10 @@
                     const seed = generateAndStart(limit, players, disable);
                     showToast('🎲 Seed generada: ' + seed, 2000);
                 });
+
                 // Select
                 document.getElementById('btn-back-select').addEventListener('click', goHome);
+
                 // Game
                 document.getElementById('btn-back-game').addEventListener('click', goHome);
                 document.getElementById('seed-badge').addEventListener('click', async () => {
@@ -776,6 +954,26 @@
                 document.getElementById('btn-apply-range').addEventListener('click', () => {
                     applyRange(document.getElementById('range-x').value, document.getElementById('range-y').value);
                 });
+
+                // Flechas y buscador
+                document.getElementById('btn-scroll-left').addEventListener('click', () => {
+                    document.getElementById('players-scroll').scrollBy({ left: -150, behavior: 'smooth' });
+                });
+                document.getElementById('btn-scroll-right').addEventListener('click', () => {
+                    document.getElementById('players-scroll').scrollBy({ left: 150, behavior: 'smooth' });
+                });
+                document.getElementById('btn-go-player').addEventListener('click', () => {
+                    const val = document.getElementById('search-player-input').value;
+                    scrollToPlayer(val);
+                    document.getElementById('search-player-input').value = '';
+                });
+                document.getElementById('search-player-input').addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        document.getElementById('btn-go-player').click();
+                    }
+                });
+
                 // Seed input overlay
                 document.getElementById('btn-seed-continue').addEventListener('click', () => {
                     const val = document.getElementById('seed-input-field').value.trim();
@@ -787,34 +985,35 @@
                 document.getElementById('seed-input-field').addEventListener('keydown', (e) => {
                     if (e.key === 'Enter') { e.preventDefault(); document.getElementById('btn-seed-continue').click(); }
                 });
+
                 // Reveal overlay
                 document.getElementById('reveal-overlay').addEventListener('click', () => { hideRevealOverlay(); renderPlayersBar(); });
                 document.getElementById('reveal-overlay').addEventListener('touchend', (e) => { e.preventDefault(); hideRevealOverlay(); renderPlayersBar(); });
-                // Tap fuera para ocultar
+
+                // Tap fuera para ocultar número revelado
                 document.getElementById('game-body').addEventListener('click', (e) => {
-                    if (revealedPlayerIndex !== null && !e.target.closest('.player-circle-btn') && !e.target.closest('.seed-badge') && !e.target.closest('.back-btn')) {
+                    if (revealedPlayerIndex !== null && !e.target.closest('.player-circle-btn') && !e.target.closest('.seed-badge') && !e.target.closest('.back-btn') && !e.target.closest('.players-header')) {
                         hideRevealOverlay(); renderPlayersBar();
                     }
                 });
                 document.getElementById('game-body').addEventListener('touchend', (e) => {
-                    if (revealedPlayerIndex !== null && !e.target.closest('.player-circle-btn') && !e.target.closest('.seed-badge') && !e.target.closest('.back-btn')) {
+                    if (revealedPlayerIndex !== null && !e.target.closest('.player-circle-btn') && !e.target.closest('.seed-badge') && !e.target.closest('.back-btn') && !e.target.closest('.players-header')) {
                         e.preventDefault(); hideRevealOverlay(); renderPlayersBar();
                     }
                 });
+
                 // Config inicial
                 document.getElementById('cfg-limit').value = 100;
                 document.getElementById('cfg-players').value = '';
                 document.getElementById('cfg-disable-numbers').checked = false;
             });
 
-            // Prevenir doble tap zoom
             document.addEventListener('touchend', (e) => {
                 const now = Date.now();
                 if (now - (document.lastTouchEnd || 0) < 350) e.preventDefault();
                 document.lastTouchEnd = now;
             }, { passive: false });
 
-            // URL seed
             (function checkUrlSeed() {
                 const params = new URLSearchParams(window.location.search);
                 const s = params.get('seed');
