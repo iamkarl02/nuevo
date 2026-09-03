@@ -534,7 +534,6 @@
             justify-content: flex-end;
         }
         .notes-modal-actions .btn { flex: 1; }
-        /* Modal nombres */
         .names-modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -627,7 +626,6 @@
                     </div>
                     <p style="font-size:0.75rem;color:var(--text2);margin-top:4px;">Permite que cada jugador tenga un espacio de notas privado en su dispositivo.</p>
                 </div>
-                <!-- NUEVA OPCIÓN NOMBRES -->
                 <div class="config-row">
                     <div class="config-row-horizontal">
                         <span class="label" style="margin-bottom:0;">🏷️ NOMBRES</span>
@@ -781,7 +779,6 @@
                 }
             }
 
-            // Codificación de nombres en base64url
             function encodeNames(namesArray) {
                 const str = namesArray.join('|');
                 return btoa(unescape(encodeURIComponent(str)))
@@ -797,7 +794,6 @@
                 return str.split('|');
             }
 
-            // Generar seed completa (con o sin nombres)
             function generateFullSeed(limit, players, disableNumbers, disableNotes, names) {
                 const base = encodeLimitToBase36(limit) + encodePlayersToBase36(players) + encodeFlagsToChar(disableNumbers, disableNotes);
                 if (names && names.length === players) {
@@ -806,21 +802,17 @@
                 return base;
             }
 
-            // Parsear seed (acepta antigua decimal o nueva alfanumérica)
             function parseSeed(seedStr) {
                 const clean = seedStr.trim();
                 if (/^\d+$/.test(clean)) {
-                    // Seed antigua decimal: convertir a base36 de 6 caracteres
                     const num = parseInt(clean, 10);
                     if (num < 0 || num > Math.pow(36, SEED_BASE36_LENGTH) - 1) throw new Error('Número fuera de rango');
                     const base36 = num.toString(36).padStart(SEED_BASE36_LENGTH, '0').toUpperCase();
                     return parseBase36Part(base36);
                 } else if (clean.length >= SEED_BASE36_LENGTH) {
-                    // Nueva seed alfanumérica
                     const basePart = clean.substring(0, SEED_BASE36_LENGTH);
                     const parsed = parseBase36Part(basePart);
                     if (clean.length > SEED_BASE36_LENGTH) {
-                        // Hay nombres: el carácter siguiente debe ser 'N'
                         if (clean[SEED_BASE36_LENGTH] !== 'N') throw new Error('Formato de seed inválido');
                         const namesEncoded = clean.substring(SEED_BASE36_LENGTH + 1);
                         parsed.names = decodeNames(namesEncoded);
@@ -1033,7 +1025,7 @@
             function getNamesFromModal() {
                 const inputs = document.querySelectorAll('#names-inputs-container input');
                 const names = [];
-                inputs.forEach(input => names.push(input.value.trim() || `Jugador ${input.dataset.index+1}`));
+                inputs.forEach(input => names.push(input.value.trim() || `Jugador ${parseInt(input.dataset.index)+1}`));
                 return names;
             }
 
@@ -1043,11 +1035,16 @@
                 document.getElementById('select-seed-display').textContent = gameState.seed;
                 const grid = document.getElementById('player-select-grid');
                 grid.innerHTML = '';
-                for (let i = 0; i < gameState.players; i++) {
+                const totalPlayers = gameState.players;
+                const threshold = 100; // Si hay más de 100 jugadores, no animar con retraso
+
+                for (let i = 0; i < totalPlayers; i++) {
                     const color = getPlayerColorHex(gameState.seed, i);
                     const btn = document.createElement('button');
                     btn.className = 'player-select-btn';
-                    btn.style.animation = `slideInLeft 0.3s ease-out ${i * 0.02}s both`;
+                    if (totalPlayers <= threshold) {
+                        btn.style.animation = `slideInLeft 0.3s ease-out ${i * 0.02}s both`;
+                    }
                     let nameHtml = '';
                     if (gameState.names && gameState.names[i]) {
                         nameHtml = `<div style="font-size:0.7rem;color:var(--text2);margin-top:4px;">${gameState.names[i]}</div>`;
@@ -1084,14 +1081,18 @@
                 if (!gameState) return;
                 const container = document.getElementById('players-scroll');
                 container.innerHTML = '';
-                const players = gameState.players;
+                const totalPlayers = gameState.players;
                 const me = gameState.currentPlayerIndex;
-                for (let i = 0; i < players; i++) {
+                const threshold = 100;
+
+                for (let i = 0; i < totalPlayers; i++) {
                     const color = getPlayerColorHex(gameState.seed, i);
                     const btn = document.createElement('button');
                     btn.className = 'player-circle-btn';
                     btn.dataset.playerIndex = i;
-                    btn.style.animation = `slideInLeft 0.3s ease-out ${i * 0.02}s both`;
+                    if (totalPlayers <= threshold) {
+                        btn.style.animation = `slideInLeft 0.3s ease-out ${i * 0.02}s both`;
+                    }
                     const isMe = (i === me);
                     const isRevealed = (revealedPlayerIndex === i);
                     const circleClass = 'circle' + (isMe ? ' me' : '') + (isRevealed ? ' revealed-glow' : '');
@@ -1263,11 +1264,9 @@
 
             // ===================== EVENTOS =====================
             document.addEventListener('DOMContentLoaded', () => {
-                // Home
                 document.getElementById('btn-generate-home').addEventListener('click', goConfig);
                 document.getElementById('btn-add-seed-home').addEventListener('click', showSeedInputOverlay);
 
-                // Config
                 document.getElementById('btn-back-config').addEventListener('click', goHome);
                 document.getElementById('btn-generate-config').addEventListener('click', () => {
                     const limit = parseInt(document.getElementById('cfg-limit').value) || 100;
@@ -1279,14 +1278,12 @@
                     const enableNames = document.getElementById('cfg-enable-names').checked;
 
                     if (enableNames) {
-                        // Determinar número de jugadores (si es aleatorio, generarlo)
                         let playerCount = players;
                         if (!playerCount || isNaN(playerCount) || playerCount < 2) {
                             playerCount = Math.floor(Math.random() * 48) + 2;
                         }
                         playerCount = Math.min(1296, Math.max(2, Math.round(playerCount)));
                         showNamesModal(playerCount);
-                        // Guardar temporalmente la config para usar al confirmar nombres
                         window._pendingConfig = { limit, playerCount, disable, disableNotes };
                     } else {
                         const seed = generateAndStart(limit, players, disable, disableNotes, null);
@@ -1294,7 +1291,6 @@
                     }
                 });
 
-                // Modal nombres
                 document.getElementById('btn-names-confirm').addEventListener('click', () => {
                     const names = getNamesFromModal();
                     hideNamesModal();
@@ -1310,10 +1306,8 @@
                     window._pendingConfig = null;
                 });
 
-                // Select
                 document.getElementById('btn-back-select').addEventListener('click', goHome);
 
-                // Game
                 document.getElementById('btn-back-game').addEventListener('click', goHome);
                 document.getElementById('seed-badge').addEventListener('click', async () => {
                     if (gameState) await copyToClipboard(gameState.seed);
@@ -1322,7 +1316,6 @@
                     applyRange(document.getElementById('range-x').value, document.getElementById('range-y').value);
                 });
 
-                // Notas
                 document.getElementById('notes-float-btn').addEventListener('click', showNotesModal);
                 document.getElementById('btn-notes-cancel').addEventListener('click', hideNotesModal);
                 document.getElementById('btn-notes-save').addEventListener('click', saveNotesFromModal);
@@ -1330,7 +1323,6 @@
                     if (e.target === document.getElementById('notes-modal-overlay')) hideNotesModal();
                 });
 
-                // Flechas y buscador
                 document.getElementById('btn-scroll-left').addEventListener('click', () => {
                     document.getElementById('players-scroll').scrollBy({ left: -150, behavior: 'smooth' });
                 });
@@ -1349,7 +1341,6 @@
                     }
                 });
 
-                // Seed input overlay
                 document.getElementById('btn-seed-continue').addEventListener('click', () => {
                     const val = document.getElementById('seed-input-field').value.trim();
                     if (!val) { showMessage('Introduce una seed', true, 1500); return; }
@@ -1361,17 +1352,14 @@
                     if (e.key === 'Enter') { e.preventDefault(); document.getElementById('btn-seed-continue').click(); }
                 });
 
-                // Reveal overlay
                 document.getElementById('reveal-overlay').addEventListener('click', () => { hideRevealOverlay(); renderPlayersBar(); });
 
-                // Tap fuera para ocultar número revelado
                 document.getElementById('game-body').addEventListener('click', (e) => {
                     if (revealedPlayerIndex !== null && !e.target.closest('.player-circle-btn') && !e.target.closest('.seed-badge') && !e.target.closest('.back-btn') && !e.target.closest('.players-header') && !e.target.closest('.notes-float-btn') && !e.target.closest('.notes-modal-overlay')) {
                         hideRevealOverlay(); renderPlayersBar();
                     }
                 });
 
-                // Config inicial
                 document.getElementById('cfg-limit').value = 100;
                 document.getElementById('cfg-players').value = '';
                 document.getElementById('cfg-disable-numbers').checked = false;
